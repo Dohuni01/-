@@ -58,55 +58,21 @@
     </div>
 
     <!-- 송금 모달 -->
-    <div id="sendModal" style="
-    display:none; 
-    position:fixed; left:0; top:0; width:100vw; height:100vh; 
-    background:rgba(0,0,0,0.23); z-index:101; 
-    align-items:center; justify-content:center;">
-    <div style="
-        background:#fff; 
-        width:320px; 
-        margin:auto; 
-        padding:24px 18px 20px 18px; 
-        border-radius:15px; 
-        box-shadow:0 2px 12px #bbb; 
-        position:relative;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    ">
-        <div style="font-size:1.2em;font-weight:bold;display:flex;align-items:center;gap:5px;">
-            🏦 <span>어디로 보낼까요?</span>
+    <div id="sendModal" class="send-modal-bg">
+        <div class="send-modal-card">
+            <div class="send-modal-title">
+                🏦 <span>어디로 보낼까요?</span>
+            </div>
+            <button onclick="closeSendModal()" class="send-modal-close">✖</button>
+            <div class="send-modal-label">최근 보낸 계좌</div>
+            <div class="send-modal-account">
+                <b>홍길동동</b><br>
+                카카오뱅크 3333-1234-1234
+             </div>
+            <button id="accountInputBtn" class="send-modal-input-btn">계좌번호 입력</button>
         </div>
-        <button onclick="closeSendModal()" style="
-            position:absolute;top:14px;right:16px;
-            border:none;background:none;
-            font-size:1.3em;cursor:pointer;">✖</button>
-        <div style="margin:4px 0 2px 0; color:#888; font-size:0.96em;">최근 보낸 계좌</div>
-        <div style="
-            margin-bottom:4px; 
-            border:1px solid #eee; 
-            border-radius:8px; 
-            padding:8px 11px;
-            background:#fafbfc;
-        ">
-            <b>김도훈</b><br>
-            국민 93930200979743
-        </div>
-        <button id="accountInputBtn" style="
-            background:#ffe812; 
-            border:none; 
-            border-radius:8px; 
-            padding:13px 0; 
-            width:100%; 
-            font-size:1.1em; 
-            font-weight:bold; 
-            color:#191919; 
-            cursor:pointer;
-            margin-top:10px;
-            ">계좌번호 입력</button>
-         </div>
     </div>
+        
 
     <!-- 배너/공지 -->
     <div class="banner-box">

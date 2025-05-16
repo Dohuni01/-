@@ -459,3 +459,77 @@ body {
     font-size: 29px;
     color: #191919;
 }
+
+/* 송금 모달 바깥 배경 */
+.send-modal-bg {
+    display: none;
+    position: fixed; left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.23);
+    z-index: 101;
+    align-items: center; justify-content: center;
+}
+
+/* 송금 모달 카드 */
+.send-modal-card {
+    background: #fff;
+    width: 320px;
+    margin: auto;
+    padding: 24px 18px 20px 18px;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px #bbb;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 타이틀(어디로 보낼까요?) */
+.send-modal-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 닫기 버튼(✖) */
+.send-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    border: none;
+    background: none;
+    font-size: 1.3em;
+    cursor: pointer;
+}
+
+/* '최근 보낸 계좌' 텍스트 */
+.send-modal-label {
+    margin: 4px 0 2px 0;
+    color: #888;
+    font-size: 0.96em;
+}
+
+/* 최근 계좌 박스 */
+.send-modal-account {
+    margin-bottom: 4px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 8px 11px;
+    background: #fafbfc;
+}
+
+/* 계좌번호 입력 버튼 */
+.send-modal-input-btn {
+    background: #ffe812;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 0;
+    width: 100%;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #191919;
+    cursor: pointer;
+    margin-top: 10px;
+}
