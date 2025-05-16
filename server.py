@@ -82,6 +82,73 @@ TALK_HISTORY_FILE = "info_dir/talk_history.txt"
 STATE_FILE = "info_dir/current_state.txt"
 PASSWORD_FILE = "info_dir/password.txt"
 
+def extract_month_year(question):
+    # "5월", "2023년 5월", "2024년 12월" 등에서 연/월 추출
+    now = datetime.now()
+    year = now.year
+    month = None
+    m = re.search(r'(\d{4})년\s*(\d{1,2})월', question)
+    if m:
+        year = int(m.group(1))
+        month = int(m.group(2))
+    else:
+        m = re.search(r'(\d{1,2})월', question)
+        if m:
+            month = int(m.group(1))
+    return year, month
+
+def detect_type(question):
+    # 송금만: "송금", "보냈"
+    if '송금' in question or '보냈' in question:
+        return 'send'
+    # 출금만: "출금", "인출"
+    if '출금' in question or '인출' in question:
+        return 'withdraw'
+    # 충전만: "충전"
+    if '충전' in question:
+        return 'charge'
+    # 전체 사용(출금+송금): "썼어", "사용", "빠져나갔"
+    if '썼' in question or '사용' in question or '빠져나갔' in question:
+        return 'all_out'
+    return None  # 못 찾으면 None
+
+def get_history_sum(year, month, mode="all_out"):
+    filename = "info_dir/money_history.txt"
+    total = 0
+    send_types = {"send"}
+    out_types = {"send", "withdraw"}
+    in_types = {"charge"}
+
+    if not os.path.exists(filename):
+        return 0
+
+    with open(filename, encoding="utf-8") as f:
+        for line in f:
+            try:
+                # "2025-05-17 06:50:39,charge,1000000,빠른충전,1000000"
+                fields = line.strip().split(",", 4)  # 5개 필드로 split
+                if len(fields) < 5:
+                    continue
+                date_str, type_, amount, desc, cur_bal = fields
+                dt = datetime.strptime(date_str.strip(), "%Y-%m-%d %H:%M:%S")
+                amount = int(amount.strip())
+                if year and dt.year != year:
+                    continue
+                if month and dt.month != month:
+                    continue
+                if mode == "send" and type_ in send_types:
+                    total += amount
+                elif mode == "withdraw" and type_ == "withdraw":
+                    total += amount
+                elif mode == "charge" and type_ in in_types:
+                    total += amount
+                elif mode == "all_out" and type_ in out_types:
+                    total += amount
+            except Exception:
+                continue
+    return total
+
+
 def normalize_name(text):
     text = re.sub(r'\s+', '', text)  # 모든 공백 제거
     # 마지막에 붙은 한글 조사/호칭 제거
@@ -225,6 +292,32 @@ def askgpt():
             answer = "질문이 없습니다."
             add_talk_history(question, answer)
             return jsonify({"answer": answer}), 400
+
+                # ==== 월별 내역 자동 답변 ====
+        year, month = extract_month_year(question)
+        qtype = detect_type(question)
+        if month:
+            if qtype == "send":
+                s = get_history_sum(year, month, mode="send")
+                answer = f"{year}년 {month}월에 송금한 총액은 {s:,}원입니다."
+                add_talk_history(question, answer)
+                return jsonify({"answer": answer})
+            elif qtype == "charge":
+                s = get_history_sum(year, month, mode="charge")
+                answer = f"{year}년 {month}월에 충전한 총액은 {s:,}원입니다."
+                add_talk_history(question, answer)
+                return jsonify({"answer": answer})
+            elif qtype == "withdraw":
+                s = get_history_sum(year, month, mode="withdraw")
+                answer = f"{year}년 {month}월에 출금한 총액은 {s:,}원입니다."
+                add_talk_history(question, answer)
+                return jsonify({"answer": answer})
+            elif qtype == "all_out":
+                s = get_history_sum(year, month, mode="all_out")
+                answer = f"{year}년 {month}월에 사용(송금/출금)한 총액은 {s:,}원입니다."
+                add_talk_history(question, answer)
+                return jsonify({"answer": answer})
+
 
         st = get_state()
 
