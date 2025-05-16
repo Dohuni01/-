@@ -36,6 +36,7 @@ instruction = """
 - 위와 상관없는 명령이면 그냥 gpt너의 답장을 해줘.
 """
 
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -48,6 +49,7 @@ from agents.mcp.server import *
 
 load_dotenv()
 
+TALK_HISTORY_PATH = "info_dir/talk_history.txt"  # 대화 기록 파일
 
 app = Flask(__name__)
 CORS(app)
@@ -60,6 +62,20 @@ def askgpt():
         question = data.get("question", "")
         if not question:
             return jsonify({"answer": "질문이 없습니다."}), 400
+
+        answer = asyncio.run(run_agent(question))
+
+        # ===== 대화 내용 파일에 저장 (append) =====
+        try:
+            os.makedirs(os.path.dirname(TALK_HISTORY_PATH), exist_ok=True)
+            with open(TALK_HISTORY_PATH, "a", encoding="utf-8") as f:
+                f.write(f"[USER] {question}\n[GPT] {answer}\n---\n")
+        except Exception as e:
+            print("대화 로그 저장 에러:", e)
+
+        return jsonify({"answer": answer})
+    except Exception as e:
+        return jsonify({"answer": f"에러 발생: {str(e)}"})
 
         # 비동기 함수 동기 컨텍스트에서 실행
         answer = asyncio.run(run_agent(question))
