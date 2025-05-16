@@ -1,104 +1,124 @@
+// src/pages/Benefit.jsx
 import React, { useState } from "react";
 import SwipePage from "../components/SwipePage";
 import Mic from "../components/Mic";
+
+// 계좌 리스트 예시
 const ACCOUNTS = [
-  { name: "국민은행", num: "093-12-000234", amount: "340,000원", icon: "🏦", mainColor: "bg-gradient-to-br from-yellow-200 to-yellow-400", shadowColor: "shadow-yellow-300/40", },
-  { name: "하나은행", num: "123-45-678910", amount: "2,500,000원", icon: "🍀", mainColor: "bg-gradient-to-br from-green-200 to-emerald-400", shadowColor: "shadow-emerald-300/40", },
-  { name: "기업은행", num: "1002-456-777777", amount: "20,000원", icon: "💙", mainColor: "bg-gradient-to-br from-blue-200 to-blue-400", shadowColor: "shadow-blue-300/40", },
-  { name: "신한은행", num: "110-123-456789", amount: "820,000원", icon: "🔷", mainColor: "bg-gradient-to-br from-sky-200 to-sky-400", shadowColor: "shadow-sky-300/40", },
-  { name: "토스뱅크", num: "1234-12-345678", amount: "3,120,000원", icon: "📲", mainColor: "bg-gradient-to-br from-indigo-200 to-indigo-500", shadowColor: "shadow-indigo-400/40", },
+  {
+    bank: "국민은행",
+    num: "9934",
+    type: "나라사랑",
+    balance: 1643056,
+    icon: "🌝", // 실제 이미지는 src/assets에 넣고 <img>로 교체 가능
+  },
+  {
+    bank: "토스뱅크",
+    num: "1234",
+    type: "입출금",
+    balance: 870000,
+    icon: "💳",
+  },
+  {
+    bank: "신한은행",
+    num: "6789",
+    type: "주거래",
+    balance: 532000,
+    icon: "🔷",
+  },
 ];
 
-export default function Charge() {
-  const [zoomIdx, setZoomIdx] = useState(null); // 전체 카드 확대
-  const [focus, setFocus] = useState({ idx: null, type: null }); // 텍스트 돋보기
+// 금액 버튼 목록
+const BUTTONS = [
+  { label: "100만원", value: 1000000 },
+  { label: "50만원", value: 500000 },
+  { label: "30만원", value: 300000 },
+  { label: "20만원", value: 200000 },
+  { label: "10만원", value: 100000 },
+  { label: "직접 입력하기", value: "custom" }
+];
 
-  // 텍스트 요소별 스타일
-  const getTextScale = (row, type) =>
-    focus.idx === row && focus.type === type
-      ? "scale-[2.4] z-20 shadow-2xl"
-      : "scale-100";
+export default function Benefit() {
+  const [selectedAccount, setSelectedAccount] = useState(0);
 
-  // 텍스트별 폰트 크기(기본값도 더 키움)
-  const getFontSize = (type, focused) => {
-    if (type === "name") return focused ? "text-[3rem]" : "text-[1.8rem] font-extrabold";
-    if (type === "num") return focused ? "text-[2.2rem]" : "text-[1.3rem] text-gray-600";
-    if (type === "amount") return focused ? "text-[3.2rem] text-blue-500" : "text-[1.7rem] text-blue-500 font-bold";
-    return "";
-  };
+  const account = ACCOUNTS[selectedAccount];
+
+  // 좌우 계좌 전환
+  const handlePrev = () => setSelectedAccount(i => (i - 1 + ACCOUNTS.length) % ACCOUNTS.length);
+  const handleNext = () => setSelectedAccount(i => (i + 1) % ACCOUNTS.length);
+
+  // 최대 충전 가능 금액(임의)
+  const maxAmount = 1839120;
 
   return (
     <SwipePage>
-      <div
-        className={`min-h-screen transition-colors duration-300 ${
-          zoomIdx === null ? "bg-[#f7f8fa]" : ACCOUNTS[zoomIdx].mainColor
-        }`}
-      >
-        <div className="h-screen overflow-y-auto flex flex-col items-center px-4 py-10 gap-6">
-          {ACCOUNTS.map((acc, row) => {
-            const isZoomed = zoomIdx === row;
-            return (
-              <button
-                key={acc.num}
-                className={`
-                  w-full max-w-xl h-40 rounded-2xl flex items-center px-6
-                  border-4 bg-white relative
-                  transition-all duration-200
-                  ${isZoomed ? `${acc.mainColor} border-yellow-400 scale-105 z-10 ${acc.shadowColor}` : "border-transparent"}
-                  hover:scale-105 hover:shadow-2xl
-                `}
-                style={{
-                  boxShadow: isZoomed ? "0 0 60px 0 rgba(0,0,0,0.10)" : undefined,
-                }}
-                onPointerDown={() => setZoomIdx(row)}
-                onPointerUp={() => setZoomIdx(null)}
-                onPointerLeave={() => setZoomIdx(null)}
-              >
-                {/* 아이콘 */}
-                <div className="text-[3rem] mr-6 select-none">{acc.icon}</div>
-
-                {/* 텍스트 정보 (각 요소에 돋보기 효과) */}
-                <div className="flex flex-col items-start relative w-full space-y-2">
-                  <span
-                    className={`text-[1.6rem] font-extrabold cursor-pointer transition-transform duration-200 inline-block origin-left ${getTextScale(row, "name")}`}
-                    onPointerDown={e => {
-                      e.stopPropagation();
-                      setFocus({ idx: row, type: "name" });
-                    }}
-                    onPointerUp={e => setFocus({ idx: null, type: null })}
-                    onPointerLeave={e => setFocus({ idx: null, type: null })}
-                  >
-                    {acc.name}
-                  </span>
-                  <span
-                    className={`text-[1.1rem] text-gray-600 cursor-pointer transition-transform duration-200 inline-block origin-left ${getTextScale(row, "num")}`}
-                    onPointerDown={e => {
-                      e.stopPropagation();
-                      setFocus({ idx: row, type: "num" });
-                    }}
-                    onPointerUp={e => setFocus({ idx: null, type: null })}
-                    onPointerLeave={e => setFocus({ idx: null, type: null })}
-                  >
-                    {acc.num}
-                  </span>
-                  <span
-                    className={`text-[2rem] text-blue-500 font-bold cursor-pointer transition-transform duration-200 inline-block origin-left ${getTextScale(row, "amount")}`}
-                    onPointerDown={e => {
-                      e.stopPropagation();
-                      setFocus({ idx: row, type: "amount" });
-                    }}
-                    onPointerUp={e => setFocus({ idx: null, type: null })}
-                    onPointerLeave={e => setFocus({ idx: null, type: null })}
-                  >
-                    {acc.amount}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+      <div className="flex flex-col items-center min-h-screen bg-[#23232A] px-4 pt-10 relative">
+        {/* 상단 계좌 박스 */}
+        <div className="w-full max-w-md flex items-center justify-between mb-8">
+          <button
+            className="w-10 h-10 rounded-full bg-[#363740] flex items-center justify-center text-white text-2xl"
+            onClick={handlePrev}
+            aria-label="이전 계좌"
+          >
+            &#60;
+          </button>
+          <div className="flex-1 mx-4 bg-[#363740] rounded-2xl flex items-center px-4 py-4 shadow">
+            {/* 아이콘/이미지 */}
+            <div className="w-12 h-12 rounded-full bg-[#857661] flex items-center justify-center text-2xl mr-4">
+              {account.icon}
+            </div>
+            <div className="flex flex-col justify-center flex-1">
+              <div className="text-lg text-white font-semibold">
+                {account.bank} {account.num} 에서
+              </div>
+              <div className="text-gray-300 text-sm">{account.type} | {account.balance.toLocaleString()}원</div>
+            </div>
+            <div className="text-gray-400 ml-2 text-lg">{/* &gt; */}▶</div>
+          </div>
+          <button
+            className="w-10 h-10 rounded-full bg-[#363740] flex items-center justify-center text-white text-2xl"
+            onClick={handleNext}
+            aria-label="다음 계좌"
+          >
+            &#62;
+          </button>
         </div>
+
+        {/* 최대 가능 금액 */}
+        
+
+        {/* 3x2 그리드 버튼 */}
+        <div className="w-full max-w-md grid grid-cols-3 grid-rows-2 gap-4 mt-3 mb-12">
+          {BUTTONS.slice(0, 5).map((btn, idx) => (
+            <button
+              key={btn.label}
+              className={`
+                flex flex-col items-center justify-center h-20 rounded-2xl bg-[#2e2f35] 
+                text-white font-bold text-xl shadow hover:bg-[#363740] transition
+              `}
+              // onClick={...} // TODO: 클릭 이벤트 추가 가능
+            >
+              {btn.label}
+              {idx === 0 && (
+                <span className="block mt-1 text-xs text-gray-400 font-normal">
+                  {/* 100만원 오른쪽 설명 */}
+                </span>
+              )}
+            </button>
+          ))}
+          <button
+            key={BUTTONS[5].label}
+            className={`
+              flex flex-col items-center justify-center h-20 rounded-2xl bg-[#2e2f35] 
+              text-white font-bold text-base shadow hover:bg-[#363740] transition
+            `}
+            // onClick={...} // TODO: 클릭 이벤트 추가 가능
+          >
+            {BUTTONS[5].label}
+          </button>
+        </div>
+        <Mic />
       </div>
-      <Mic />
     </SwipePage>
   );
 }

@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Mic from "../components/Mic";
+import SwipePage from "../components/SwipePage";
 const NAVS = [
   { label: "자산", to: "/money", color: "bg-blue-500" },
   { label: "혜택", to: "/benefit", color: "bg-green-500" },
@@ -19,6 +20,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   return (
+    <SwipePage>
     <div className="bg-[#f7f8fa] min-h-screen flex flex-col justify-center items-center px-2">
       <div className="w-full max-w-sm flex flex-col gap-6 py-10">
         {NAVS.map(({ label, to, color }) => (
@@ -49,5 +51,6 @@ export default function Home() {
       </div>
       <Mic />
     </div>
+    </SwipePage>
   );
 }
