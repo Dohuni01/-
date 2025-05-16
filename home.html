@@ -172,15 +172,7 @@
             };
         });
 
-        // 2. 음성 명령 → 각 페이지 이동 or GPT TTS
-        const pageMap = [
-            { keys: ["홈"], file: "home.html" },
-            { keys: ["혜택", "benefit"], file: "benefit.html" },
-            { keys: ["결제", "pay", "결제창"], file: "pay.html" },
-            { keys: ["머니", "자산", "money"], file: "money.html" },
-            { keys: ["증권", "페이퍼", "paper"], file: "paper.html" }
-        ];
-
+        // 2. 음성 명령: 오직 GPT가 "페이지 이동: [파일명]" 답변할 때만 이동, 그 외는 TTS 답변
         let isRecording = false;
         let recognition = null;
         let transcriptAll = '';
@@ -215,39 +207,30 @@
                 const userSpeech = transcriptAll.trim();
                 if (!userSpeech) return;
 
-                // ★ 실제 인식된 문장 콘솔로 확인 (디버깅용, 배포 시 제거)
-                console.log("음성 인식:", userSpeech);
+                // 🔥 음성 합성(TTS) 중이면 즉시 중단
+                window.speechSynthesis.cancel();
 
-                // 페이지 이동 키워드만 들어가도 바로 이동 (조건 넓게)
-                let found = false;
-                for (let page of pageMap) {
-                    for (let key of page.keys) {
-                        if (userSpeech.includes(key)) {
-                            location.href = page.file;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) break;
-                }
-                // 못찾으면 GPT에게 질문 + TTS
-                if (!found) {
-                    fetch('http://localhost:3000/askgpt', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ question: userSpeech })
-                    })
-                        .then(r => r.json())
-                        .then(data => {
-                            let answer = (data.answer || '응답이 없습니다.');
+                fetch('http://localhost:3000/askgpt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: userSpeech })
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        let answer = (data.answer || '응답이 없습니다.');
+                        // "페이지 이동: [파일명]" 패턴이면 이동, 아니면 TTS
+                        const moveMatch = answer.match(/페이지 이동: (home\.html|benefit\.html|pay\.html|money\.html|paper\.html)/);
+                        if (moveMatch) {
+                            location.href = moveMatch[1];
+                        } else {
                             const tts = new SpeechSynthesisUtterance(answer);
                             tts.lang = 'ko-KR';
                             window.speechSynthesis.speak(tts);
-                        })
-                        .catch(err => {
-                            // 실패시에도 UI 변화 없음
-                        });
-                }
+                        }
+                    })
+                    .catch(err => {
+                        // 실패시에도 UI 변화 없음
+                    });
             };
 
             voiceBtn.onclick = function () {
