@@ -1,249 +1,606 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <meta charset="UTF-8">
-  <title>카카오페이 홈</title>
-  <meta name="viewport" content="width=400, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <title>카카오페이 홈</title>
+    <meta name="viewport" content="width=400, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            margin: 0;
+            background: #f7f8fa;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            padding: 26px 18px 10px 18px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-weight: bold;
+            font-size: 23px;
+            color: #191919;
+            margin-left: 6px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 6px;
+            border-radius: 50%;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+        }
+
+        .header-btn:hover {
+            background: #f6f8fa;
+            box-shadow: 0 4px 16px rgba(52, 130, 246, 0.11);
+            transform: translateY(-2px) scale(1.09);
+        }
+
+        .header-icon {
+            font-size: 21px;
+            color: #444;
+            transition: color 0.13s;
+        }
+
+        .header-btn:hover .header-icon {
+            color: #1877f2;
+        }
+
+        /* 페이머니 박스 */
+        .money-box {
+            background: #fff;
+            border-radius: 18px;
+            margin: 12px 12px 0 12px;
+            padding: 18px 18px 12px 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .money-row {
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            color: #999;
+        }
+
+        .money-label {
+            font-weight: 500;
+            color: #6e6e6e;
+        }
+
+        .money-dot {
+            font-size: 7px;
+            margin: 0 5px;
+        }
+
+        .money-balance-row {
+            display: flex;
+            align-items: flex-end;
+            margin: 10px 0;
+        }
+
+        .money-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #222;
+            margin-right: 10px;
+            letter-spacing: -1px;
+            background: #fff;
+        }
+
+        .money-arrow {
+            font-size: 17px;
+            color: #b2b2b2;
+            margin-left: 2px;
+        }
+
+        .money-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .money-action {
+            background: #ececec;
+            border: none;
+            border-radius: 8px;
+            color: #444;
+            font-size: 15px;
+            padding: 6px 18px;
+            cursor: pointer;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+            font-weight: 500;
+        }
+
+        .money-action.yellow {
+            background: #ffe812;
+            color: #222;
+            font-weight: bold;
+        }
+
+        .money-action:hover,
+        .money-action.yellow:hover {
+            box-shadow: 0 4px 16px rgba(52, 130, 246, 0.13);
+            transform: translateY(-2px) scale(1.08);
+            background: #f8fafd;
+        }
+
+        .money-action.yellow:hover {
+            background: #fff275;
+        }
+
+        .interest-btn {
+            background: #1887fc;
+            color: #fff;
+            font-size: 14px;
+            border-radius: 12px;
+            padding: 5px 18px;
+            border: none;
+            margin-top: 6px;
+            width: fit-content;
+            cursor: pointer;
+            font-weight: 500;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+        }
+
+        .interest-btn:hover {
+            box-shadow: 0 4px 16px rgba(24, 135, 252, 0.19);
+            background: #309eff;
+            transform: translateY(-2px) scale(1.08);
+        }
+
+        /* 배너/공지 박스 */
+        .banner-box {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            padding: 16px 18px 12px 18px;
+            margin: 14px 12px 0 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .banner-title {
+            font-size: 16px;
+            color: #232323;
+            margin-bottom: 7px;
+        }
+
+        .banner-link-btn {
+            color: #1877f2;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            padding: 0 7px;
+            border-radius: 6px;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+        }
+
+        .banner-link-btn:hover {
+            background: #f4f8fe;
+            box-shadow: 0 4px 16px rgba(24, 135, 252, 0.11);
+            transform: translateY(-2px) scale(1.07);
+        }
+
+        .banner-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 9px;
+            background: #f1f3fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        /* 주요 서비스 아이콘 */
+        .service-grid {
+            margin: 16px 12px 0 12px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px 12px 13px 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 13px 2px;
+        }
+
+        .service-btn {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 13px;
+            color: #555;
+            position: relative;
+            cursor: pointer;
+            border-radius: 12px;
+            padding: 6px 0;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+        }
+
+        .service-btn:hover {
+            background: #f7fafc;
+            box-shadow: 0 4px 20px rgba(24, 135, 252, 0.10);
+            transform: translateY(-2px) scale(1.07);
+        }
+
+        .service-icon {
+            width: 33px;
+            height: 33px;
+            background: #f6f8fa;
+            border-radius: 10px;
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #1887fc;
+            transition: background 0.13s;
+        }
+
+        .service-btn:hover .service-icon {
+            background: #e3f1fd;
+        }
+
+        .service-badge {
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            background: #ffe812;
+            color: #181600;
+            font-size: 10px;
+            border-radius: 7px;
+            padding: 1px 6px;
+            font-weight: bold;
+        }
+
+        /* 광고/홍보 */
+        .ad-box {
+            background: #f4f7fb;
+            border-radius: 14px;
+            margin: 15px 12px 0 12px;
+            padding: 14px 16px 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ad-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ad-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .ad-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .ad-brand {
+            color: #ef4b4b;
+            font-weight: bold;
+            font-size: 15px;
+            margin-left: 13px;
+        }
+
+        /* 통합내역 */
+        .history-section {
+            margin: 17px 12px 80px 12px;
+        }
+
+        .history-title {
+            font-size: 15px;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .history-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 15px 15px 15px 15px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .history-avatar {
+            width: 39px;
+            height: 39px;
+            border-radius: 50%;
+            margin-right: 13px;
+            background: #e3e3e3;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .history-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .history-right {
+            text-align: right;
+            min-width: 90px;
+        }
+
+        .history-amount {
+            font-size: 15px;
+            color: #191919;
+            font-weight: bold;
+        }
+
+        .history-type {
+            font-size: 12px;
+            color: #1887fc;
+        }
+
+        /* 하단 네비게이션 */
+        .bottom-nav {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: 0 auto;
+            width: 100vw;
+            max-width: 440px;
+            background: #fff;
+            border-top: 1px solid #f3f3f3;
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 7px 0;
+            z-index: 20;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #bbb;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 10px;
+            padding: 4px 0;
+            transition: box-shadow 0.17s, background 0.14s, color 0.15s;
+        }
+
+        .nav-btn.selected {
+            color: #191919;
+        }
+
+        .nav-btn:hover {
+            background: #f7fafc;
+            box-shadow: 0 4px 18px rgba(24, 135, 252, 0.12);
+            color: #1877f2;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 2px;
+        }
+
+        .nav-badge {
+            background: #ff3636;
+            color: #fff;
+            font-size: 9px;
+            border-radius: 8px;
+            padding: 1px 5px;
+            margin-left: 3px;
+            margin-top: -11px;
+            position: absolute;
+        }
+
+        /* 음성버튼 */
+        .voice-btn {
+            position: fixed;
+            right: 22px;
+            bottom: 85px;
+            z-index: 30;
+            width: 56px;
+            height: 56px;
+            background: #fee500;
+            border-radius: 50%;
+            box-shadow: 0 4px 20px rgba(254, 229, 0, 0.20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: box-shadow 0.20s, background 0.15s, transform 0.13s;
+        }
+
+        .voice-btn:hover {
+            background: #ffe812;
+            box-shadow: 0 7px 24px rgba(254, 229, 0, 0.26);
+            transform: translateY(-3px) scale(1.1);
+        }
+
+        .voice-icon {
+            font-size: 29px;
+            color: #191919;
+        }
+    </style>
 </head>
-<body class="bg-[#f7f8fa] min-h-screen relative font-sans">
 
-  <!-- 상단 헤더 -->
-  <div class="pt-7 px-5 pb-2">
-    <div class="flex items-center justify-between">
-      <div class="font-bold text-2xl text-[#191919] flex items-center gap-1">
-        <span>💬</span>pay
-      </div>
-      <div class="flex gap-4 items-center">
-        <button class="bg-none border-none rounded-full p-1.5 hover:bg-[#f6f8fa] hover:shadow-md hover:text-blue-600 transition"><span class="text-xl">&#128269;</span></button>
-        <button class="bg-none border-none rounded-full p-1.5 hover:bg-[#f6f8fa] hover:shadow-md hover:text-blue-600 transition relative">
-          <span class="text-xl">&#128276;</span>
-          <span class="absolute top-0 right-0 bg-red-500 w-2 h-2 rounded-full"></span>
+<body>
+    <!-- 상단 헤더 -->
+    <div class="header">
+        <div class="header-row">
+            <span style="font-weight: bold; font-size: 21px;">&#128172;pay</span>
+            <div class="header-icons">
+                <button class="header-btn"><span class="header-icon">&#128269;</span></button>
+                <button class="header-btn"><span class="header-icon">&#128276;</span></button>
+                <button class="header-btn"><span class="header-icon">&#9776;</span></button>
+            </div>
+        </div>
+    </div>
+    <!-- 페이머니 -->
+    <div class="money-box">
+        <div class="money-row">
+            <span class="money-label">페이머니</span>
+            <span class="money-dot">•</span>
+            <span style="color:#b2b2b2;">pay</span>
+            <span class="money-dot">•</span>
+            <span style="font-size:13px; color:#bbb;">증권 <span title="i">ⓘ</span></span>
+        </div>
+        <div class="money-balance-row">
+            <span class="money-amount">1,000,000원</span>
+            <span class="money-arrow">&#8250;</span>
+        </div>
+        <div style="display: flex; gap:10px;">
+            <button class="interest-btn">2원 이자 받기</button>
+            <div style="flex:1;"></div>
+            <button class="money-action">충전</button>
+            <button class="money-action yellow">송금</button>
+        </div>
+    </div>
+    <!-- 배너/공지 -->
+    <div class="banner-box">
+        <div>
+            <div class="banner-title">유심 없이 바로 개통하는 법</div>
+            <button class="banner-link-btn">확인하기</button>
+        </div>
+        <div class="banner-img">&#128241;</div>
+    </div>
+    <!-- 주요 서비스 그리드 -->
+    <div class="service-grid">
+        <button class="service-btn">
+            <div class="service-icon">&#128179;</div>
+            결제
         </button>
-        <button class="bg-none border-none rounded-full p-1.5 hover:bg-[#f6f8fa] hover:shadow-md hover:text-blue-600 transition"><span class="text-xl">&#9776;</span></button>
-      </div>
+        <button class="service-btn">
+            <div class="service-icon" style="background:#ffe812;color:#222;">&#128176;<span
+                    class="service-badge">pay</span></div>
+            손해보험
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128179;</div>
+            카드만들기
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128181;</div>
+            대출비교
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128200;</div>
+            신용관리
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128138;</div>
+            보험진단
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128241;</div>
+            통신비할인
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#8250;</div>
+            더보기
+        </button>
     </div>
-  </div>
-
-  <!-- 페이머니 박스 -->
-  <div class="bg-white rounded-[18px] mx-3 mt-3 px-5 py-4 shadow flex flex-col gap-2">
-    <div class="flex items-center text-[15px] text-gray-400 gap-1">
-      <span class="font-medium text-[#6e6e6e]">페이머니</span>
-      <span class="mx-1 text-[7px]">•</span>
-      <span class="text-[#b2b2b2]">pay</span>
-      <span class="mx-1 text-[7px]">•</span>
-      <span class="text-[13px] text-[#bbb]">증권 <span title="i">ⓘ</span></span>
+    <!-- 광고/홍보 박스 -->
+    <div class="ad-box">
+        <div class="ad-left">
+            <span class="ad-title">AIA 건강+암보험(갱신형)<br>암 보험료 얼마일까?</span>
+            <span class="ad-desc">생명보험협회 심의필 제 2025-01614호<br>(2025-03-18~2026-03-17)</span>
+        </div>
+        <span class="ad-brand">AIA생명</span>
     </div>
-    <div class="flex items-end my-2">
-      <span id ="balance" class="text-[28px] font-bold text-[#222] mr-2 bg-white">0원</span>
-      <span class="text-[17px] text-[#b2b2b2] ml-1">&#8250;</span>
+    <!-- 통합내역 -->
+    <div class="history-section">
+        <div class="history-title">통합내역</div>
+        <div class="history-card">
+            <div class="history-avatar">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="프로필"
+                    style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div class="history-info">
+                <span class="history-name">홍길동</span>
+                <span class="history-date">05.16. · 3시간 전</span>
+            </div>
+            <div class="history-right">
+                <span class="history-amount">+100,000원</span><br>
+                <span class="history-type">송금</span>
+            </div>
+        </div>
+        <!-- 추가 내역도 이런 식으로 복붙 가능 -->
     </div>
-    <div class="flex items-center gap-3 mt-2">
-      <button class="bg-[#1887fc] hover:bg-[#309eff] text-white text-[14px] rounded-[12px] px-4 py-1 font-medium shadow transition">2원 이자 받기</button>
-      <div class="flex-1"></div>
-      <button id ="chargeBtn" class="bg-[#ececec] hover:bg-[#f8fafd] text-[#444] text-[15px] rounded-[8px] px-4 py-1 font-medium transition">충전</button>
-      <button id ="sendBtn" class="bg-[#ffe812] hover:bg-[#fff275] text-[#222] text-[15px] rounded-[8px] px-4 py-1 font-bold transition">송금</button>
+    <!-- 하단 네비게이션 -->
+    <div class="bottom-nav">
+        <button class="nav-btn selected" id="nav-home">
+            <span class="nav-icon">&#8962;</span>
+            홈
+        </button>
+        <button class="nav-btn" id="nav-benefit">
+            <span class="nav-icon">&#127873;<span class="nav-badge">•</span></span>
+            혜택
+        </button>
+        <button class="nav-btn" id="nav-pay">
+            <span class="nav-icon">&#128179;</span>
+            결제
+        </button>
+        <button class="nav-btn" id="nav-money">
+            <span class="nav-icon">&#128176;</span>
+            자산
+        </button>
+        <button class="nav-btn" id="nav-paper">
+            <span class="nav-icon">&#128200;</span>
+            증권
+        </button>
     </div>
-  </div>
-  <!-- 충전 모달 -->
-  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center">
-    <div class="bg-white w-80 rounded-xl p-5 shadow-xl relative">
-      <div class="text-lg font-bold mb-4">💳 얼마나 충전할까요?</div>
-      <button onclick="closeModal()" class="absolute top-3 right-4 text-xl text-gray-500 hover:text-red-500">✖</button>
-      <div class="space-y-2">
-        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="1000000">100만원</button>
-        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="500000">50만원</button>
-        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="300000">30만원</button>
-        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="200000">20만원</button>
-        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="100000">10만원</button>
-        <button id="customCharge" class="w-full bg-blue-100 hover:bg-blue-200 rounded py-2 mt-2 font-semibold">직접 입력하기</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 송금 모달 -->
-  <div id="sendModal" class="hidden fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center">
-    <div class="bg-white w-80 rounded-xl p-5 shadow-xl relative">
-      <div class="text-lg font-bold mb-4">🏦 어디로 보낼까요?</div>
-      <button onclick="closeSendModal()" class="absolute top-3 right-4 text-xl text-gray-500 hover:text-red-500">✖</button>
-      <div class="text-sm text-gray-500 mb-2">최근 보낸 계좌</div>
-      <div class="border border-gray-200 rounded-md p-3 mb-4">
-        <b>김도훈</b><br>
-        국민 93930200979743
-      </div>
-      <button id="accountInputBtn" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 rounded">
-        계좌번호 입력
-      </button>
-    </div>
-  </div>
-
-
-  <!-- 배너/공지 -->
-  <div class="bg-white rounded-xl shadow mx-3 mt-4 p-4 flex justify-between items-center">
-    <div>
-      <div class="text-[16px] font-semibold text-[#232323] mb-1">유심 없이 바로 개통하는 법</div>
-      <button class="text-[#1877f2] text-[15px] font-bold underline px-2 py-1 rounded transition hover:bg-[#f4f8fe] hover:shadow-sm">확인하기</button>
-    </div>
-    <div class="w-11 h-11 bg-[#f1f3fa] rounded-[9px] flex items-center justify-center text-[30px]">📱</div>
-  </div>
-
-  <!-- 주요 서비스 그리드 -->
-  <div class="bg-white rounded-[15px] shadow mx-3 mt-4 py-5 px-3 grid grid-cols-4 gap-x-1 gap-y-2">
-    <button class="flex flex-col items-center text-[13px] text-[#555] rounded-[12px] py-2 hover:bg-[#f7fafc] hover:shadow transition">
-      <div class="w-8 h-8 bg-[#f6f8fa] rounded-[10px] flex items-center justify-center text-[18px] text-[#1887fc] mb-1">&#128179;</div>
-      결제
+    <!-- 오른쪽 아래 음성버튼 -->
+    <button class="voice-btn" id="voice-btn" title="음성 질문">
+        <span class="voice-icon">&#127908;</span>
     </button>
-    <button class="flex flex-col items-center text-[13px] text-[#555] rounded-[12px] py-2 hover:bg-[#f7fafc] hover:shadow transition relative">
-      <div class="w-8 h-8 bg-[#ffe812] rounded-[10px] flex items-center justify-center text-[18px] text-[#222] mb-1">&#128176;</div>
-      <span class="absolute top-0 right-4 bg-[#ffe812] text-[#181600] text-[10px] rounded px-1.5 font-bold">pay</span>
-      손해보험
-    </button>
-    <button class="flex flex-col items-center text-[13px] text-[#555] rounded-[12px] py-2 hover:bg-[#f7fafc] hover:shadow transition">
-      <div class="w-8 h-8 bg-[#f6f8fa] rounded-[10px] flex items-center justify-center text-[18px] text-[#1887fc] mb-1">&#128179;</div>
-      카드만들기
-    </button>
-    <button class="flex flex-col items-center text-[13px] text-[#555] rounded-[12px] py-2 hover:bg-[#f7fafc] hover:shadow transition">
-      <div class="w-8 h-8 bg-[#f6f8fa] rounded-[10px] flex items-center justify-center text-[18px] text-[#1887fc] mb-1">&#128181;</div>
-      대출비교
-    </button>
-    <button class="flex flex-col items-center text-[13px] text-[#555] rounded-[12px] py-2 hover:bg-[#f7fafc] hover:shadow transition">
-      <div class="w-8 h-8 bg-[#f6f8fa] rounded-[10px] flex items-center justify-center text-[18px] text-[#1887fc] mb-1">&#128200;</div>
-      신용관리
-    </button>
-    <button class="flex flex-col items-center text-[13px] text-[#555] rounded-[12px] py-2 hover:bg-[#f7fafc] hover:shadow transition">
-      <div class="w-8 h-8 bg-[#f6f8fa] rounded-[10px] flex items-center justify-center text-[18px] text-[#1887fc] mb-1">&#128138;</div>
-      보험진단
-    </button>
-    <button class="flex flex-col items-center text-[13px] text-[#555] rounded-[12px] py-2 hover:bg-[#f7fafc] hover:shadow transition">
-      <div class="w-8 h-8 bg-[#f6f8fa] rounded-[10px] flex items-center justify-center text-[18px] text-[#1887fc] mb-1">&#128241;</div>
-      통신비할인
-    </button>
-    <button class="flex flex-col items-center text-[13px] text-[#555] rounded-[12px] py-2 hover:bg-[#f7fafc] hover:shadow transition">
-      <div class="w-8 h-8 bg-[#f6f8fa] rounded-[10px] flex items-center justify-center text-[18px] text-[#1887fc] mb-1">&#8250;</div>
-      더보기
-    </button>
-  </div>
-
-  <!-- 광고/홍보 박스 -->
-  <div class="bg-[#f4f7fb] rounded-[14px] mx-3 mt-4 px-4 py-3 flex justify-between items-center">
-    <div class="flex flex-col">
-      <span class="text-[14px] font-medium text-[#444] leading-tight">AIA 건강+암보험(갱신형)<br>암 보험료 얼마일까?</span>
-      <span class="text-[12px] text-[#999] mt-1">생명보험협회 심의필 제 2025-01614호<br>(2025-03-18~2026-03-17)</span>
-    </div>
-    <span class="text-[#ef4b4b] font-bold text-[15px] ml-4">AIA생명</span>
-  </div>
-
-  <!-- 통합내역 -->
-  <div class="mx-3 mt-4 mb-28">
-    <div class="text-[15px] text-[#888] font-semibold mb-2">통합내역</div>
-    <div class="bg-white rounded-[14px] shadow p-4 flex items-center mb-2">
-      <div class="w-[39px] h-[39px] rounded-full bg-[#e3e3e3] overflow-hidden flex items-center justify-center mr-4">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="프로필" class="w-full h-full object-cover"/>
-      </div>
-      <div class="flex-1 flex flex-col gap-0.5">
-        <span class="text-[14px] font-medium text-[#222]">홍길동</span>
-        <span class="text-[12px] text-[#bbb]">05.16. · 3시간 전</span>
-      </div>
-      <div class="text-right min-w-[90px]">
-        <span class="text-[15px] font-bold text-[#191919]">+100,000원</span><br>
-        <span class="text-[12px] text-[#1887fc]">송금</span>
-      </div>
-    </div>
-    <!-- 추가 내역 복붙 가능 -->
-  </div>
-
-  <!-- 하단 네비게이션 -->
-  <div class="fixed left-0 right-0 bottom-0 max-w-[440px] w-full mx-auto bg-white border-t border-[#f3f3f3] flex justify-around py-2 z-20">
-    <button class="flex flex-col items-center text-[12px] font-medium text-[#191919]">
-      <span class="text-[22px] mb-0.5">&#8962;</span>
-      홈
-    </button>
-    <button class="flex flex-col items-center text-[12px] font-medium text-[#bbb] relative">
-      <span class="text-[22px] mb-0.5">🎁<span class="absolute top-0 right-0 bg-[#ff3636] text-white text-[9px] rounded-full px-1 ml-1 -mt-2">•</span></span>
-      혜택
-    </button>
-    <button class="flex flex-col items-center text-[12px] font-medium text-[#bbb]">
-      <span class="text-[22px] mb-0.5">&#128179;</span>
-      결제
-    </button>
-    <button class="flex flex-col items-center text-[12px] font-medium text-[#bbb]">
-      <span class="text-[22px] mb-0.5">&#128176;</span>
-      자산
-    </button>
-    <button class="flex flex-col items-center text-[12px] font-medium text-[#bbb]">
-      <span class="text-[22px] mb-0.5">&#128200;</span>
-      증권
-    </button>
-  </div>
-
-  <!-- 오른쪽 아래 음성버튼 -->
-  <button class="fixed right-6 bottom-24 z-30 w-14 h-14 bg-[#fee500] hover:bg-[#ffe812] rounded-full shadow-lg flex items-center justify-center border-none transition text-[29px]" id="voice-btn" title="음성 질문">
-    <span class="text-[#191919]">&#127908;</span>
-  </button>
     <script>
-      let balance = 0;
-
-    function updateBalance() {
-      document.getElementById('balance').textContent = balance.toLocaleString() + "원";
-    }
-
-    // 충전 모달
-    document.getElementById('chargeBtn').addEventListener('click', () => {
-      document.getElementById('modal').classList.remove('hidden');
-    });
-
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-    }
-
-    document.querySelectorAll('.quick-charge').forEach(btn => {
-      btn.addEventListener('click', function () {
-        const amount = parseInt(this.getAttribute('data-amount'));
-        balance += amount;
-        updateBalance();
-        alert(amount.toLocaleString() + "원이 충전되었습니다.");
-        closeModal();
-      });
-    });
-
-    document.getElementById('customCharge').addEventListener('click', () => {
-      const input = prompt("충전할 금액을 직접 입력하세요:");
-      const amount = parseInt(input);
-      if (!isNaN(amount) && amount > 0) {
-        balance += amount;
-        updateBalance();
-        alert(amount + "원이 충전되었습니다.");
-        closeModal();
-      } else {
-        alert("올바른 금액을 입력해주세요.");
-      }
-    });
-
-    // 송금 모달
-    document.getElementById('sendBtn').addEventListener('click', () => {
-      document.getElementById('sendModal').classList.remove('hidden');
-    });
-
-    function closeSendModal() {
-      document.getElementById('sendModal').classList.add('hidden');
-    }
-
-    document.getElementById('accountInputBtn').addEventListener('click', () => {
-      const account = prompt("계좌번호를 입력하세요:");
-      if (!account) return alert("계좌번호를 입력해야 합니다.");
-
-      const amount = prompt("송금할 금액을 입력하세요:");
-      const intAmount = parseInt(amount);
-      if (isNaN(intAmount) || intAmount <= 0) return alert("올바른 금액을 입력해주세요.");
-      if (intAmount > balance) return alert("잔액이 부족합니다.");
-
-      balance -= intAmount;
-      updateBalance();
-      alert(account + " 계좌로 " + intAmount.toLocaleString() + "원을 송금했습니다.");
-      closeSendModal();
-    });
-
-    updateBalance();    
         // 1. 하단 네비게이션/서비스 버튼 클릭 시 이동
         document.getElementById('nav-home').onclick = () => location.href = 'home.html';
         document.getElementById('nav-benefit').onclick = () => location.href = 'benefit.html';
@@ -267,15 +624,7 @@
             };
         });
 
-        // 2. 음성 명령 → 각 페이지 이동 or GPT TTS
-        const pageMap = [
-            { keys: ["홈"], file: "home.html" },
-            { keys: ["혜택", "benefit"], file: "benefit.html" },
-            { keys: ["결제", "pay", "결제창"], file: "pay.html" },
-            { keys: ["머니", "자산", "money"], file: "money.html" },
-            { keys: ["증권", "페이퍼", "paper"], file: "paper.html" }
-        ];
-
+        // 2. 음성 명령: 오직 GPT가 "페이지 이동: [파일명]" 답변할 때만 이동, 그 외는 TTS 답변
         let isRecording = false;
         let recognition = null;
         let transcriptAll = '';
@@ -310,39 +659,30 @@
                 const userSpeech = transcriptAll.trim();
                 if (!userSpeech) return;
 
-                // ★ 실제 인식된 문장 콘솔로 확인 (디버깅용, 배포 시 제거)
-                console.log("음성 인식:", userSpeech);
+                // 🔥 음성 합성(TTS) 중이면 즉시 중단
+                window.speechSynthesis.cancel();
 
-                // 페이지 이동 키워드만 들어가도 바로 이동 (조건 넓게)
-                let found = false;
-                for (let page of pageMap) {
-                    for (let key of page.keys) {
-                        if (userSpeech.includes(key)) {
-                            location.href = page.file;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) break;
-                }
-                // 못찾으면 GPT에게 질문 + TTS
-                if (!found) {
-                    fetch('http://localhost:3000/askgpt', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ question: userSpeech })
-                    })
-                        .then(r => r.json())
-                        .then(data => {
-                            let answer = (data.answer || '응답이 없습니다.');
+                fetch('http://localhost:3000/askgpt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: userSpeech })
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        let answer = (data.answer || '응답이 없습니다.');
+                        // "페이지 이동: [파일명]" 패턴이면 이동, 아니면 TTS
+                        const moveMatch = answer.match(/페이지 이동: (home\.html|benefit\.html|pay\.html|money\.html|paper\.html)/);
+                        if (moveMatch) {
+                            location.href = moveMatch[1];
+                        } else {
                             const tts = new SpeechSynthesisUtterance(answer);
                             tts.lang = 'ko-KR';
                             window.speechSynthesis.speak(tts);
-                        })
-                        .catch(err => {
-                            // 실패시에도 UI 변화 없음
-                        });
-                }
+                        }
+                    })
+                    .catch(err => {
+                        // 실패시에도 UI 변화 없음
+                    });
             };
 
             voiceBtn.onclick = function () {
@@ -359,6 +699,7 @@
             };
         }
     </script>
+
 
 </body>
 

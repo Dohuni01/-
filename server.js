@@ -1,4 +1,4 @@
-require('dotenv').config(); // ← .env 파일을 읽어오기 위해 꼭 필요
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
@@ -9,8 +9,20 @@ app.use(cors());
 app.use(express.json());
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+const pages = [
+    { name: "홈", file: "home.html" },
+    { name: "혜택", file: "benefit.html" },
+    { name: "결제", file: "pay.html" },
+    { name: "자산", file: "money.html" },
+    { name: "머니", file: "money.html" },
+    { name: "증권", file: "paper.html" },
+    { name: "페이퍼", file: "paper.html" }
+];
+
+// 홈화면에서 보여줄 자산 등 정보
+const balance = "1,000,000원";
 
 app.post('/askgpt', async (req, res) => {
     try {
@@ -19,9 +31,43 @@ app.post('/askgpt', async (req, res) => {
             return res.status(400).json({ answer: '질문이 없습니다.' });
         }
 
+        // 프롬프트에 '반드시 아래 5개 파일명만 이동 명령에 사용' 명시!
+        const prompt = `
+아래는 사용자가 카카오페이 홈/자산/결제/혜택/증권 페이지에서 음성명령으로 요청하는 내용이야.
+
+- 만약 사용자가 "페이지 이동"이나 "창 이동" 같은 명령(예: 자산창으로 이동해줘, 결제창으로 가줘, 혜택 보여줘 등)을 했으면
+  반드시 아래 중 하나의 파일명만 골라서
+  "페이지 이동: [파일명]" 이렇게만 답해줘.
+  - home.html (홈)
+  - benefit.html (혜택)
+  - pay.html (결제)
+  - money.html (자산/머니)
+  - paper.html (증권/페이퍼)
+- 단순히 정보(예: 내 자산 얼마야, 혜택 뭐 있어, 결제 설명해줘 등)를 물어보면 이동 명령 없이 자연스럽게 답해줘.
+
+[자산 정보]
+현재 자산은 ${balance}입니다.
+
+[사용자 질문]
+${question}
+
+[예시]
+- "자산창으로 이동해줘" → "페이지 이동: money.html"
+- "홈으로 가" → "페이지 이동: home.html"
+- "증권 보여줘" → "페이지 이동: paper.html"
+- "내 자산 얼마야?" → "현재 자산은 1,000,000원입니다."
+- "혜택 알려줘" → "현재 특별한 혜택은 없습니다."
+- "결제창으로 이동" → "페이지 이동: pay.html"
+- "홈에서 혜택창으로 이동해줘" → "페이지 이동: benefit.html"
+- "자산 얼마야" → "현재 자산은 1,000,000원입니다."
+- "안녕" → "안녕하세요!"
+`;
+
         const completion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: question }],
+            messages: [
+                { role: "system", content: prompt }
+            ],
             max_tokens: 400,
         });
 
