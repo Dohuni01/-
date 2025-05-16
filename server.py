@@ -117,6 +117,10 @@ def detect_type(question):
         return 'withdraw'
     if '충전' in question:
         return 'charge'
+    if '혜택' in question and ('이동' not in question and '창' not in question):
+        return 'benefit'
+    # ... 이하 동일
+
     return None
 
 
@@ -304,6 +308,18 @@ def askgpt():
                 # ==== 월별 내역 자동 답변 ====
         year, month = extract_month_year(question)
         qtype = detect_type(question)
+        if qtype == "benefit":
+            benefit_file = "info_dir/benefit.txt"
+            items = []
+            if os.path.exists(benefit_file):
+                with open(benefit_file, encoding="utf-8") as f:
+                    items = [line.strip() for line in f if line.strip()]
+            if not items:
+                answer = "현재 특별한 혜택은 없습니다."
+            else:
+                answer = " ".join([f"{i+1}. {v}" for i,v in enumerate(items)])
+            add_talk_history(question, answer)
+            return jsonify({"answer": answer})
         if month:
             if qtype == "send":
                 s = get_history_sum(year, month, mode="send")
@@ -550,6 +566,15 @@ def api_get_contacts():
                 name, number = line.strip().split(",", 1)
                 contacts.append({"name": name.strip(), "number": number.strip()})
     return jsonify({"contacts": contacts})
+
+@app.route("/api/benefit", methods=["GET"])
+def api_get_benefit():
+    benefit_file = "info_dir/benefit.txt"
+    items = []
+    if os.path.exists(benefit_file):
+        with open(benefit_file, encoding="utf-8") as f:
+            items = [line.strip() for line in f if line.strip()]
+    return jsonify({"benefit": items})
 
 
 # async 작업을 따로 함수로 분리
