@@ -463,11 +463,15 @@ body {
 /* 송금 모달 바깥 배경 */
 .send-modal-bg {
     display: none;
-    position: fixed; left: 0; top: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.23);
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.23);
     z-index: 101;
-    align-items: center; justify-content: center;
+    align-items: center;
+    justify-content: center;
 }
 
 /* 송금 모달 카드 */
