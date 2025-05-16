@@ -35,16 +35,48 @@
       <span class="text-[13px] text-[#bbb]">증권 <span title="i">ⓘ</span></span>
     </div>
     <div class="flex items-end my-2">
-      <span class="text-[28px] font-bold text-[#222] mr-2 bg-white">1,000,000원</span>
+      <span id ="balance" class="text-[28px] font-bold text-[#222] mr-2 bg-white">0원</span>
       <span class="text-[17px] text-[#b2b2b2] ml-1">&#8250;</span>
     </div>
     <div class="flex items-center gap-3 mt-2">
       <button class="bg-[#1887fc] hover:bg-[#309eff] text-white text-[14px] rounded-[12px] px-4 py-1 font-medium shadow transition">2원 이자 받기</button>
       <div class="flex-1"></div>
-      <button class="bg-[#ececec] hover:bg-[#f8fafd] text-[#444] text-[15px] rounded-[8px] px-4 py-1 font-medium transition">충전</button>
-      <button class="bg-[#ffe812] hover:bg-[#fff275] text-[#222] text-[15px] rounded-[8px] px-4 py-1 font-bold transition">송금</button>
+      <button id ="chargeBtn" class="bg-[#ececec] hover:bg-[#f8fafd] text-[#444] text-[15px] rounded-[8px] px-4 py-1 font-medium transition">충전</button>
+      <button id ="sendBtn" class="bg-[#ffe812] hover:bg-[#fff275] text-[#222] text-[15px] rounded-[8px] px-4 py-1 font-bold transition">송금</button>
     </div>
   </div>
+  <!-- 충전 모달 -->
+  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center">
+    <div class="bg-white w-80 rounded-xl p-5 shadow-xl relative">
+      <div class="text-lg font-bold mb-4">💳 얼마나 충전할까요?</div>
+      <button onclick="closeModal()" class="absolute top-3 right-4 text-xl text-gray-500 hover:text-red-500">✖</button>
+      <div class="space-y-2">
+        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="1000000">100만원</button>
+        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="500000">50만원</button>
+        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="300000">30만원</button>
+        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="200000">20만원</button>
+        <button class="quick-charge w-full bg-gray-100 hover:bg-gray-200 rounded py-2" data-amount="100000">10만원</button>
+        <button id="customCharge" class="w-full bg-blue-100 hover:bg-blue-200 rounded py-2 mt-2 font-semibold">직접 입력하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 송금 모달 -->
+  <div id="sendModal" class="hidden fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center">
+    <div class="bg-white w-80 rounded-xl p-5 shadow-xl relative">
+      <div class="text-lg font-bold mb-4">🏦 어디로 보낼까요?</div>
+      <button onclick="closeSendModal()" class="absolute top-3 right-4 text-xl text-gray-500 hover:text-red-500">✖</button>
+      <div class="text-sm text-gray-500 mb-2">최근 보낸 계좌</div>
+      <div class="border border-gray-200 rounded-md p-3 mb-4">
+        <b>김도훈</b><br>
+        국민 93930200979743
+      </div>
+      <button id="accountInputBtn" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 rounded">
+        계좌번호 입력
+      </button>
+    </div>
+  </div>
+
 
   <!-- 배너/공지 -->
   <div class="bg-white rounded-xl shadow mx-3 mt-4 p-4 flex justify-between items-center">
@@ -149,6 +181,69 @@
     <span class="text-[#191919]">&#127908;</span>
   </button>
     <script>
+      let balance = 0;
+
+    function updateBalance() {
+      document.getElementById('balance').textContent = balance.toLocaleString() + "원";
+    }
+
+    // 충전 모달
+    document.getElementById('chargeBtn').addEventListener('click', () => {
+      document.getElementById('modal').classList.remove('hidden');
+    });
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    document.querySelectorAll('.quick-charge').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const amount = parseInt(this.getAttribute('data-amount'));
+        balance += amount;
+        updateBalance();
+        alert(amount.toLocaleString() + "원이 충전되었습니다.");
+        closeModal();
+      });
+    });
+
+    document.getElementById('customCharge').addEventListener('click', () => {
+      const input = prompt("충전할 금액을 직접 입력하세요:");
+      const amount = parseInt(input);
+      if (!isNaN(amount) && amount > 0) {
+        balance += amount;
+        updateBalance();
+        alert(amount + "원이 충전되었습니다.");
+        closeModal();
+      } else {
+        alert("올바른 금액을 입력해주세요.");
+      }
+    });
+
+    // 송금 모달
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      document.getElementById('sendModal').classList.remove('hidden');
+    });
+
+    function closeSendModal() {
+      document.getElementById('sendModal').classList.add('hidden');
+    }
+
+    document.getElementById('accountInputBtn').addEventListener('click', () => {
+      const account = prompt("계좌번호를 입력하세요:");
+      if (!account) return alert("계좌번호를 입력해야 합니다.");
+
+      const amount = prompt("송금할 금액을 입력하세요:");
+      const intAmount = parseInt(amount);
+      if (isNaN(intAmount) || intAmount <= 0) return alert("올바른 금액을 입력해주세요.");
+      if (intAmount > balance) return alert("잔액이 부족합니다.");
+
+      balance -= intAmount;
+      updateBalance();
+      alert(account + " 계좌로 " + intAmount.toLocaleString() + "원을 송금했습니다.");
+      closeSendModal();
+    });
+
+    updateBalance();    
         // 1. 하단 네비게이션/서비스 버튼 클릭 시 이동
         document.getElementById('nav-home').onclick = () => location.href = 'home.html';
         document.getElementById('nav-benefit').onclick = () => location.href = 'benefit.html';
