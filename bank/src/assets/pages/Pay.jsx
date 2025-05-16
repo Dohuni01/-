@@ -4,11 +4,11 @@ import SwipePage from "../components/SwipePage";
 
 // 카드 데이터
 const ACCOUNTS = [ 
-  { bank: "카카오뱅크", barcode: "/barcode1.png", qr: "/qr1.png", cardIcon: "🏦", mainColor: "bg-gradient-to-br from-yellow-200 to-yellow-400" }, 
-  { bank: "국민은행", barcode: "/barcode2.png", qr: "/qr2.png", cardIcon: "💳", mainColor: "bg-gradient-to-br from-yellow-200 to-yellow-400" }, 
-  { bank: "토스뱅크", barcode: "/barcode3.png", qr: "/qr3.png", cardIcon: "📲", mainColor: "bg-gradient-to-br from-indigo-200 to-indigo-500" },
-  { bank: "하나은행", barcode: "/barcode4.png", qr: "/qr4.png", cardIcon: "🍀", mainColor: "bg-gradient-to-br from-green-200 to-emerald-400" },
-  { bank: "신한은행", barcode: "/barcode5.png", qr: "/qr5.png", cardIcon: "🔷", mainColor: "bg-gradient-to-br from-sky-200 to-sky-400" },
+  { bank: "카카오뱅크", barcode: "../../banklogo/barcode.png", qr: "../../banklogo/qr.png", cardIcon: "🏦", mainColor: "bg-gradient-to-br from-yellow-200 to-yellow-400" }, 
+  { bank: "국민은행", barcode: "../../banklogo/barcode.png", qr: "../../banklogo/qr.png", cardIcon: "💳", mainColor: "bg-gradient-to-br from-yellow-200 to-yellow-400" }, 
+  { bank: "토스뱅크", barcode: "../../banklogo/barcode.png", qr: "../../banklogo/qr.png", cardIcon: "📲", mainColor: "bg-gradient-to-br from-indigo-200 to-indigo-500" },
+  { bank: "하나은행", barcode: "../../banklogo/barcode.png", qr: "../../banklogo/qr.png", cardIcon: "🍀", mainColor: "bg-gradient-to-br from-green-200 to-emerald-400" },
+  { bank: "신한은행", barcode: "../../banklogo/barcode.png", qr: "../../banklogo/qr.png", cardIcon: "🔷", mainColor: "bg-gradient-to-br from-sky-200 to-sky-400" },
 ];
 
 // 무한 스크롤용 카드 배열
@@ -99,7 +99,7 @@ export default function Pay() {
         {/* 스크롤 카드 목록 */}
         <div
           ref={scrollRef}
-          className="w-full max-w-md h-[380px] my-10 overflow-y-scroll snap-y snap-mandatory flex flex-col gap-6 scrollbar-none"
+          className="w-full max-w-md h-[550px] my-10 overflow-y-scroll snap-y snap-mandatory flex flex-col gap-6 scrollbar-none"
           style={{
             scrollSnapType: "y mandatory",
             WebkitOverflowScrolling: "touch",
@@ -107,6 +107,7 @@ export default function Pay() {
             msOverflowStyle: "none"
           }}
         >
+
           <style>{`
             .scrollbar-none::-webkit-scrollbar { display: none; }
           `}</style>
@@ -151,14 +152,14 @@ export default function Pay() {
               <img
                 src={acc.barcode}
                 alt="바코드 크게"
-                className="w-[95vw] h-[24vw] max-w-3xl rounded-xl bg-white object-contain shadow-2xl"
+                className="w-[95vw] h-[24vw] max-w-xl rounded-xl bg-white object-contain shadow-2xl"
                 style={{ aspectRatio: "5/1" }}
                 draggable={false}
               />
               <img
                 src={acc.qr}
                 alt="QR코드 크게"
-                className="w-[50vw] h-[50vw] max-w-lg rounded-xl bg-white object-contain shadow-2xl mt-8"
+                className="w-[30vw] h-[30vw] max-w-lg rounded-xl bg-white object-contain shadow-2xl mt-8"
                 style={{ aspectRatio: "1/1" }}
                 draggable={false}
               />
