@@ -1,3 +1,5 @@
+require('dotenv').config(); // ← .env 파일을 읽어오기 위해 꼭 필요
+
 const express = require('express');
 const cors = require('cors');
 const { OpenAI } = require('openai');
@@ -6,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const OPENAI_API_KEY = 'api'; // 본인 OpenAI API 키 입력
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
