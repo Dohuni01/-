@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-
+import Header from "../components/Header.jsx";
+import Navigation from "../components/Navigation.jsx";
+import Mic from "../components/Mic.jsx";
 const amounts = [1000000, 500000, 300000, 200000, 100000];
 
 export default function PayMoneyCard() {
