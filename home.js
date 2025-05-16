@@ -25,6 +25,7 @@ document.querySelectorAll('.service-btn').forEach((btn, idx) => {
 let isRecording = false;
 let recognition = null;
 let transcriptAll = '';
+let firstClick = true;
 
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const voiceBtn = document.getElementById('voice-btn');
@@ -94,4 +95,53 @@ if (!window.SpeechRecognition) {
             recognition.stop();
         }
     };
+
+    // 마이크 버튼 누르면 안내멘트(최초 1회), 안내멘트 끝나면 음성인식 시작
+    // voiceBtn.onclick = function () {
+    //     window.speechSynthesis.cancel();
+
+    //     if (firstClick) {
+    //         firstClick = false;
+    //         // 안내 멘트
+    //         const greeting = new SpeechSynthesisUtterance("안녕하세요 보이스 뱅크입니다. 무엇을 도와드릴까요?");
+    //         greeting.lang = 'ko-KR';
+    //         window.speechSynthesis.speak(greeting);
+
+    //         greeting.onend = () => {
+    //             if (!isRecording) {
+    //                 recognition.start();
+    //                 isRecording = true;
+    //                 voiceBtn.innerHTML = '<span class="voice-icon">⏹️</span>';
+    //             }
+    //         };
+    //     } else {
+    //         if (!isRecording) {
+    //             recognition.start();
+    //             isRecording = true;
+    //             voiceBtn.innerHTML = '<span class="voice-icon">⏹️</span>';
+    //         } else {
+    //             recognition.stop();
+    //         }
+    //     }
+    // };
+
+    // // 페이지 진입하면 마이크 버튼을 자동 클릭 (즉시 음성인식 시작)
+    // window.addEventListener('DOMContentLoaded', () => {
+    //     voiceBtn.click();
+    // });
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.SpeechRecognition && recognition && !isRecording) {
+            const greeting = new SpeechSynthesisUtterance("안녕하세요 보이스 뱅크입니다. 무엇을 도와드릴까요?");
+            greeting.lang = 'ko-KR';
+            window.speechSynthesis.speak(greeting);
+
+            greeting.onend = () => {
+                if (!isRecording) {
+                    recognition.start();
+                    isRecording = true;
+                    voiceBtn.innerHTML = '<span class="voice-icon">⏹️</span>';
+                }
+            };
+        }
+    });
 }
