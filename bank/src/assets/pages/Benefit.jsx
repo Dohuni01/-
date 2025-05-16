@@ -1,11 +1,15 @@
-import Header from "../components/Header.jsx";
-import Navigation from "../components/Navigation.jsx";
-import Mic from "../components/Mic.jsx";
-const Benefit = () => (
-  <div className="bg-[#f7f8fa] min-h-screen relative font-sans">
-    <Header />
-    <div>Benefit 화면</div>
-    <Navigation />
-  </div>
-);
-export default Benefit;
+// src/pages/Benefit.jsx
+import React from "react";
+import SwipePage from "../components/SwipePage";
+import Mic from "../components/Mic";
+export default function Benefit() {
+  return (
+    <SwipePage>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-[#f7f8fa]">
+        <div className="text-2xl font-bold text-gray-400">빈 페이지</div>
+        <Mic />
+      </div>
+    </SwipePage>
+  );
+}
+
