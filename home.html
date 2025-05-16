@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>카카오페이 홈</title>
+    <meta name="viewport" content="width=400, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            margin: 0;
+            background: #f7f8fa;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            padding: 26px 18px 10px 18px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-weight: bold;
+            font-size: 23px;
+            color: #191919;
+            margin-left: 6px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 6px;
+            border-radius: 50%;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+        }
+
+        .header-btn:hover {
+            background: #f6f8fa;
+            box-shadow: 0 4px 16px rgba(52, 130, 246, 0.11);
+            transform: translateY(-2px) scale(1.09);
+        }
+
+        .header-icon {
+            font-size: 21px;
+            color: #444;
+            transition: color 0.13s;
+        }
+
+        .header-btn:hover .header-icon {
+            color: #1877f2;
+        }
+
+        /* 페이머니 박스 */
+        .money-box {
+            background: #fff;
+            border-radius: 18px;
+            margin: 12px 12px 0 12px;
+            padding: 18px 18px 12px 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .money-row {
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            color: #999;
+        }
+
+        .money-label {
+            font-weight: 500;
+            color: #6e6e6e;
+        }
+
+        .money-dot {
+            font-size: 7px;
+            margin: 0 5px;
+        }
+
+        .money-balance-row {
+            display: flex;
+            align-items: flex-end;
+            margin: 10px 0;
+        }
+
+        .money-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #222;
+            margin-right: 10px;
+            letter-spacing: -1px;
+            background: #fff;
+        }
+
+        .money-arrow {
+            font-size: 17px;
+            color: #b2b2b2;
+            margin-left: 2px;
+        }
+
+        .money-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .money-action {
+            background: #ececec;
+            border: none;
+            border-radius: 8px;
+            color: #444;
+            font-size: 15px;
+            padding: 6px 18px;
+            cursor: pointer;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+            font-weight: 500;
+        }
+
+        .money-action.yellow {
+            background: #ffe812;
+            color: #222;
+            font-weight: bold;
+        }
+
+        .money-action:hover,
+        .money-action.yellow:hover {
+            box-shadow: 0 4px 16px rgba(52, 130, 246, 0.13);
+            transform: translateY(-2px) scale(1.08);
+            background: #f8fafd;
+        }
+
+        .money-action.yellow:hover {
+            background: #fff275;
+        }
+
+        .interest-btn {
+            background: #1887fc;
+            color: #fff;
+            font-size: 14px;
+            border-radius: 12px;
+            padding: 5px 18px;
+            border: none;
+            margin-top: 6px;
+            width: fit-content;
+            cursor: pointer;
+            font-weight: 500;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+        }
+
+        .interest-btn:hover {
+            box-shadow: 0 4px 16px rgba(24, 135, 252, 0.19);
+            background: #309eff;
+            transform: translateY(-2px) scale(1.08);
+        }
+
+        /* 배너/공지 박스 */
+        .banner-box {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            padding: 16px 18px 12px 18px;
+            margin: 14px 12px 0 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .banner-title {
+            font-size: 16px;
+            color: #232323;
+            margin-bottom: 7px;
+        }
+
+        .banner-link-btn {
+            color: #1877f2;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            padding: 0 7px;
+            border-radius: 6px;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+        }
+
+        .banner-link-btn:hover {
+            background: #f4f8fe;
+            box-shadow: 0 4px 16px rgba(24, 135, 252, 0.11);
+            transform: translateY(-2px) scale(1.07);
+        }
+
+        .banner-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 9px;
+            background: #f1f3fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        /* 주요 서비스 아이콘 */
+        .service-grid {
+            margin: 16px 12px 0 12px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px 12px 13px 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 13px 2px;
+        }
+
+        .service-btn {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 13px;
+            color: #555;
+            position: relative;
+            cursor: pointer;
+            border-radius: 12px;
+            padding: 6px 0;
+            transition: box-shadow 0.18s, background 0.16s, transform 0.15s;
+        }
+
+        .service-btn:hover {
+            background: #f7fafc;
+            box-shadow: 0 4px 20px rgba(24, 135, 252, 0.10);
+            transform: translateY(-2px) scale(1.07);
+        }
+
+        .service-icon {
+            width: 33px;
+            height: 33px;
+            background: #f6f8fa;
+            border-radius: 10px;
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #1887fc;
+            transition: background 0.13s;
+        }
+
+        .service-btn:hover .service-icon {
+            background: #e3f1fd;
+        }
+
+        .service-badge {
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            background: #ffe812;
+            color: #181600;
+            font-size: 10px;
+            border-radius: 7px;
+            padding: 1px 6px;
+            font-weight: bold;
+        }
+
+        /* 광고/홍보 */
+        .ad-box {
+            background: #f4f7fb;
+            border-radius: 14px;
+            margin: 15px 12px 0 12px;
+            padding: 14px 16px 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ad-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ad-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .ad-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .ad-brand {
+            color: #ef4b4b;
+            font-weight: bold;
+            font-size: 15px;
+            margin-left: 13px;
+        }
+
+        /* 통합내역 */
+        .history-section {
+            margin: 17px 12px 80px 12px;
+        }
+
+        .history-title {
+            font-size: 15px;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .history-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 15px 15px 15px 15px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .history-avatar {
+            width: 39px;
+            height: 39px;
+            border-radius: 50%;
+            margin-right: 13px;
+            background: #e3e3e3;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .history-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .history-right {
+            text-align: right;
+            min-width: 90px;
+        }
+
+        .history-amount {
+            font-size: 15px;
+            color: #191919;
+            font-weight: bold;
+        }
+
+        .history-type {
+            font-size: 12px;
+            color: #1887fc;
+        }
+
+        /* 하단 네비게이션 */
+        .bottom-nav {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: 0 auto;
+            width: 100vw;
+            max-width: 440px;
+            background: #fff;
+            border-top: 1px solid #f3f3f3;
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 7px 0;
+            z-index: 20;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #bbb;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 10px;
+            padding: 4px 0;
+            transition: box-shadow 0.17s, background 0.14s, color 0.15s;
+        }
+
+        .nav-btn.selected {
+            color: #191919;
+        }
+
+        .nav-btn:hover {
+            background: #f7fafc;
+            box-shadow: 0 4px 18px rgba(24, 135, 252, 0.12);
+            color: #1877f2;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 2px;
+        }
+
+        .nav-badge {
+            background: #ff3636;
+            color: #fff;
+            font-size: 9px;
+            border-radius: 8px;
+            padding: 1px 5px;
+            margin-left: 3px;
+            margin-top: -11px;
+            position: absolute;
+        }
+
+        /* 음성버튼 */
+        .voice-btn {
+            position: fixed;
+            right: 22px;
+            bottom: 85px;
+            z-index: 30;
+            width: 56px;
+            height: 56px;
+            background: #fee500;
+            border-radius: 50%;
+            box-shadow: 0 4px 20px rgba(254, 229, 0, 0.20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: box-shadow 0.20s, background 0.15s, transform 0.13s;
+        }
+
+        .voice-btn:hover {
+            background: #ffe812;
+            box-shadow: 0 7px 24px rgba(254, 229, 0, 0.26);
+            transform: translateY(-3px) scale(1.1);
+        }
+
+        .voice-icon {
+            font-size: 29px;
+            color: #191919;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 상단 헤더 -->
+    <div class="header">
+        <div class="header-row">
+            <span style="font-weight: bold; font-size: 21px;">&#128172;pay</span>
+            <div class="header-icons">
+                <button class="header-btn"><span class="header-icon">&#128269;</span></button>
+                <button class="header-btn"><span class="header-icon">&#128276;</span></button>
+                <button class="header-btn"><span class="header-icon">&#9776;</span></button>
+            </div>
+        </div>
+    </div>
+    <!-- 페이머니 -->
+    <div class="money-box">
+        <div class="money-row">
+            <span class="money-label">페이머니</span>
+            <span class="money-dot">•</span>
+            <span style="color:#b2b2b2;">pay</span>
+            <span class="money-dot">•</span>
+            <span style="font-size:13px; color:#bbb;">증권 <span title="i">ⓘ</span></span>
+        </div>
+        <div class="money-balance-row">
+            <span class="money-amount">1,000,000원</span>
+            <span class="money-arrow">&#8250;</span>
+        </div>
+        <div style="display: flex; gap:10px;">
+            <button class="interest-btn">2원 이자 받기</button>
+            <div style="flex:1;"></div>
+            <button class="money-action">충전</button>
+            <button class="money-action yellow">송금</button>
+        </div>
+    </div>
+    <!-- 배너/공지 -->
+    <div class="banner-box">
+        <div>
+            <div class="banner-title">유심 없이 바로 개통하는 법</div>
+            <button class="banner-link-btn">확인하기</button>
+        </div>
+        <div class="banner-img">&#128241;</div>
+    </div>
+    <!-- 주요 서비스 그리드 -->
+    <div class="service-grid">
+        <button class="service-btn">
+            <div class="service-icon">&#128179;</div>
+            결제
+        </button>
+        <button class="service-btn">
+            <div class="service-icon" style="background:#ffe812;color:#222;">&#128176;<span
+                    class="service-badge">pay</span></div>
+            손해보험
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128179;</div>
+            카드만들기
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128181;</div>
+            대출비교
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128200;</div>
+            신용관리
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128138;</div>
+            보험진단
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#128241;</div>
+            통신비할인
+        </button>
+        <button class="service-btn">
+            <div class="service-icon">&#8250;</div>
+            더보기
+        </button>
+    </div>
+    <!-- 광고/홍보 박스 -->
+    <div class="ad-box">
+        <div class="ad-left">
+            <span class="ad-title">AIA 건강+암보험(갱신형)<br>암 보험료 얼마일까?</span>
+            <span class="ad-desc">생명보험협회 심의필 제 2025-01614호<br>(2025-03-18~2026-03-17)</span>
+        </div>
+        <span class="ad-brand">AIA생명</span>
+    </div>
+    <!-- 통합내역 -->
+    <div class="history-section">
+        <div class="history-title">통합내역</div>
+        <div class="history-card">
+            <div class="history-avatar">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="프로필"
+                    style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div class="history-info">
+                <span class="history-name">홍길동</span>
+                <span class="history-date">05.16. · 3시간 전</span>
+            </div>
+            <div class="history-right">
+                <span class="history-amount">+100,000원</span><br>
+                <span class="history-type">송금</span>
+            </div>
+        </div>
+        <!-- 추가 내역도 이런 식으로 복붙 가능 -->
+    </div>
+    <!-- 하단 네비게이션 -->
+    <div class="bottom-nav">
+        <button class="nav-btn selected" id="nav-home">
+            <span class="nav-icon">&#8962;</span>
+            홈
+        </button>
+        <button class="nav-btn" id="nav-benefit">
+            <span class="nav-icon">&#127873;<span class="nav-badge">•</span></span>
+            혜택
+        </button>
+        <button class="nav-btn" id="nav-pay">
+            <span class="nav-icon">&#128179;</span>
+            결제
+        </button>
+        <button class="nav-btn" id="nav-money">
+            <span class="nav-icon">&#128176;</span>
+            자산
+        </button>
+        <button class="nav-btn" id="nav-paper">
+            <span class="nav-icon">&#128200;</span>
+            증권
+        </button>
+    </div>
+    <!-- 오른쪽 아래 음성버튼 -->
+    <button class="voice-btn" id="voice-btn" title="음성 질문">
+        <span class="voice-icon">&#127908;</span>
+    </button>
+    <script>
+        // 1. 하단 네비게이션/서비스 버튼 클릭 시 이동
+        document.getElementById('nav-home').onclick = () => location.href = 'home.html';
+        document.getElementById('nav-benefit').onclick = () => location.href = 'benefit.html';
+        document.getElementById('nav-pay').onclick = () => location.href = 'pay.html';
+        document.getElementById('nav-money').onclick = () => location.href = 'money.html';
+        document.getElementById('nav-paper').onclick = () => location.href = 'paper.html';
+
+        // 주요 서비스 버튼 연결 (service-btn 순서: 결제/손해보험/카드만들기/대출비교/신용관리/보험진단/통신비할인/더보기)
+        document.querySelectorAll('.service-btn').forEach((btn, idx) => {
+            btn.onclick = () => {
+                switch (idx) {
+                    case 0: location.href = 'pay.html'; break;      // 결제
+                    case 1: location.href = 'money.html'; break;    // 손해보험→자산
+                    case 2: location.href = 'benefit.html'; break;  // 카드만들기→혜택
+                    case 3: location.href = 'money.html'; break;    // 대출비교→자산
+                    case 4: location.href = 'money.html'; break;    // 신용관리→자산
+                    case 5: location.href = 'money.html'; break;    // 보험진단→자산
+                    case 6: location.href = 'money.html'; break;    // 통신비할인→자산
+                    case 7: location.href = 'benefit.html'; break;  // 더보기→혜택
+                }
+            };
+        });
+
+        // 2. 음성 명령 → 각 페이지 이동 or GPT TTS
+        const pageMap = [
+            { keys: ["홈"], file: "home.html" },
+            { keys: ["혜택", "benefit"], file: "benefit.html" },
+            { keys: ["결제", "pay", "결제창"], file: "pay.html" },
+            { keys: ["머니", "자산", "money"], file: "money.html" },
+            { keys: ["증권", "페이퍼", "paper"], file: "paper.html" }
+        ];
+
+        let isRecording = false;
+        let recognition = null;
+        let transcriptAll = '';
+
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const voiceBtn = document.getElementById('voice-btn');
+        if (!window.SpeechRecognition) {
+            alert('이 브라우저는 음성 인식을 지원하지 않습니다.');
+            voiceBtn.disabled = true;
+        } else {
+            recognition = new window.SpeechRecognition();
+            recognition.lang = 'ko-KR';
+            recognition.interimResults = false;
+            recognition.continuous = false;
+
+            recognition.onstart = () => {
+                transcriptAll = '';
+                voiceBtn.innerHTML = '<span class="voice-icon">⏹️</span>';
+            };
+            recognition.onresult = (event) => {
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    transcriptAll += event.results[i][0].transcript;
+                }
+            };
+            recognition.onerror = (event) => {
+                isRecording = false;
+                voiceBtn.innerHTML = '<span class="voice-icon">&#127908;</span>';
+            };
+            recognition.onend = () => {
+                isRecording = false;
+                voiceBtn.innerHTML = '<span class="voice-icon">&#127908;</span>';
+                const userSpeech = transcriptAll.trim();
+                if (!userSpeech) return;
+
+                // ★ 실제 인식된 문장 콘솔로 확인 (디버깅용, 배포 시 제거)
+                console.log("음성 인식:", userSpeech);
+
+                // 페이지 이동 키워드만 들어가도 바로 이동 (조건 넓게)
+                let found = false;
+                for (let page of pageMap) {
+                    for (let key of page.keys) {
+                        if (userSpeech.includes(key)) {
+                            location.href = page.file;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) break;
+                }
+                // 못찾으면 GPT에게 질문 + TTS
+                if (!found) {
+                    fetch('http://localhost:3000/askgpt', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question: userSpeech })
+                    })
+                        .then(r => r.json())
+                        .then(data => {
+                            let answer = (data.answer || '응답이 없습니다.');
+                            const tts = new SpeechSynthesisUtterance(answer);
+                            tts.lang = 'ko-KR';
+                            window.speechSynthesis.speak(tts);
+                        })
+                        .catch(err => {
+                            // 실패시에도 UI 변화 없음
+                        });
+                }
+            };
+
+            voiceBtn.onclick = function () {
+                if (!isRecording) {
+                    recognition.start();
+                    isRecording = true;
+                    voiceBtn.innerHTML = '<span class="voice-icon">⏹️</span>';
+                } else {
+                    recognition.stop();
+                }
+            };
+        }
+    </script>
+
+</body>
+
+</html>
