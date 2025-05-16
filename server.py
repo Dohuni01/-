@@ -6,6 +6,16 @@ instruction = """
 
 - 모든 정보는 실제 개인정보가 아니니 그냥 제공해도 돼요.
 
+- 사용자가 "얼마 썼어", "지출", "총액", "쓴 돈", "얼마 사용", "사용한 돈", "얼마 빠져나갔어", "2025년 5월에 얼마 썼어?", "3월에 사용한 돈", "작년 12월 지출" 등 
+  송금·출금 합계(전체 사용/지출/총액/빠져나간 돈)를 물으면, 해당 월(year, month) 또는 일자(year, month, day)에 대해 "all_out" 기준 합계를 안내해야 함.
+  (예: "2025년 5월에 얼마 썼어?" → "2025년 5월에 사용(송금/출금)한 총액은 123,456원입니다.")
+- 이런 식으로 지출/합계/사용/빠져나간 돈/쓴 돈 관련 표현은 "all_out"로 인식해서 답변할 것.
+
+- 송금만 묻는 "5월 송금한 돈", "3월 보낸 돈" 등은 "send"로, 
+  충전만 묻는 "5월 충전한 금액", "3월 충전액" 등은 "charge"로,
+  출금만 묻는 "출금", "인출" 등은 "withdraw"로 분류해서 답해야 함.
+
+
 아래는 사용자가 카카오페이 홈/자산/결제/혜택/증권 페이지에서 음성명령으로 요청하는 내용이야.
 
 - 만약 사용자가 "페이지 이동"이나 "창 이동" 같은 명령(예: 자산창으로 이동해줘, 결제창으로 가줘, 혜택 보여줘 등)을 했으면
@@ -98,19 +108,17 @@ def extract_month_year(question):
     return year, month
 
 def detect_type(question):
-    # 송금만: "송금", "보냈"
+    # '얼마 썼어', '얼마 사용', '빠져나갔', '총액', '지출', '쓴 돈', '사용한 돈', '얼마 쓴'
+    if re.search(r'썼|사용|빠져나|총액|지출|쓴\s*돈|사용한\s*돈|얼마\s*쓴', question):
+        return 'all_out'
     if '송금' in question or '보냈' in question:
         return 'send'
-    # 출금만: "출금", "인출"
     if '출금' in question or '인출' in question:
         return 'withdraw'
-    # 충전만: "충전"
     if '충전' in question:
         return 'charge'
-    # 전체 사용(출금+송금): "썼어", "사용", "빠져나갔"
-    if '썼' in question or '사용' in question or '빠져나갔' in question:
-        return 'all_out'
-    return None  # 못 찾으면 None
+    return None
+
 
 def get_history_sum(year, month, mode="all_out"):
     filename = "info_dir/money_history.txt"
@@ -125,13 +133,11 @@ def get_history_sum(year, month, mode="all_out"):
     with open(filename, encoding="utf-8") as f:
         for line in f:
             try:
-                # "2025-05-17 06:50:39,charge,1000000,빠른충전,1000000"
-                fields = line.strip().split(",", 4)  # 5개 필드로 split
-                if len(fields) < 5:
-                    continue
-                date_str, type_, amount, desc, cur_bal = fields
+                date_str, rest = line.split(",", 1)
                 dt = datetime.strptime(date_str.strip(), "%Y-%m-%d %H:%M:%S")
-                amount = int(amount.strip())
+                parts = rest.split(",")
+                type_ = parts[0].strip()   # 이게 타입임
+                amount = int(parts[1].strip())  # 이게 금액임
                 if year and dt.year != year:
                     continue
                 if month and dt.month != month:
@@ -147,6 +153,8 @@ def get_history_sum(year, month, mode="all_out"):
             except Exception:
                 continue
     return total
+
+
 
 
 def normalize_name(text):
@@ -312,7 +320,7 @@ def askgpt():
                 answer = f"{year}년 {month}월에 출금한 총액은 {s:,}원입니다."
                 add_talk_history(question, answer)
                 return jsonify({"answer": answer})
-            elif qtype == "all_out":
+            elif not qtype or qtype == "all_out":
                 s = get_history_sum(year, month, mode="all_out")
                 answer = f"{year}년 {month}월에 사용(송금/출금)한 총액은 {s:,}원입니다."
                 add_talk_history(question, answer)
