@@ -142,7 +142,13 @@ if (!window.SpeechRecognition) {
                 const cmdMatch = answer.match(/명령: (\w+)/);
                 const actionMap = {
                     charge: () => document.getElementById('modal').style.display = "flex",
-                    send: () => document.getElementById('sendModal').style.display = "flex"
+                    send: () => document.getElementById('sendModal').style.display = "flex",
+                    change: () => {
+                        const change = new SpeechSynthesisUtterance("현재 남은 금액은 " + balance + "원 입니다.");
+                        change.lang = 'ko-KR';
+                        window.speechSynthesis.speak(change);
+                    }
+
                     // 앞으로 여기에 원하는 기능 확장!
                 };
                 if (cmdMatch && actionMap[cmdMatch[1]]) {
