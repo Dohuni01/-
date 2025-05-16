@@ -1,12 +1,38 @@
-//---------충전 및 송금 부분--------
+//---------- 잔액(서버연동) ----------
 let balance = 0;
 
-// 잔액 표시 업데이트
+function fetchBalanceAndUpdate() {
+    fetch('http://localhost:3000/api/balance')
+        .then(res => res.json())
+        .then(data => {
+            balance = data.balance || 0;
+            updateBalance();
+        });
+}
+
 function updateBalance() {
     document.getElementById('balance').textContent = balance.toLocaleString() + "원";
 }
 
-// 충전 모달
+// 서버에 잔액 반영
+function setBalanceOnServer(newBalance) {
+    return fetch('http://localhost:3000/api/balance', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ balance: newBalance })
+    });
+}
+
+// 내역 기록
+function saveMoneyHistory(action, amount, desc) {
+    fetch('http://localhost:3000/api/money_history', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, amount, desc })
+    });
+}
+
+//========= 충전 ==============
 document.getElementById('chargeBtn').addEventListener('click', () => {
     document.getElementById('modal').style.display = "flex";
 });
@@ -17,9 +43,12 @@ document.querySelectorAll('.quick-charge').forEach(btn => {
     btn.addEventListener('click', function () {
         const amount = parseInt(this.getAttribute('data-amount'));
         balance += amount;
-        updateBalance();
-        alert(amount.toLocaleString() + "원이 충전되었습니다.");
-        closeModal();
+        setBalanceOnServer(balance).then(() => {
+            updateBalance();
+            saveMoneyHistory("charge", amount, "빠른충전");
+            alert(amount.toLocaleString() + "원이 충전되었습니다.");
+            closeModal();
+        });
     });
 });
 document.getElementById('customCharge').addEventListener('click', () => {
@@ -27,38 +56,113 @@ document.getElementById('customCharge').addEventListener('click', () => {
     const amount = parseInt(input);
     if (!isNaN(amount) && amount > 0) {
         balance += amount;
-        updateBalance();
-        alert(amount + "원이 충전되었습니다.");
-        closeModal();
+        setBalanceOnServer(balance).then(() => {
+            updateBalance();
+            saveMoneyHistory("charge", amount, "직접입력충전");
+            alert(amount + "원이 충전되었습니다.");
+            closeModal();
+        });
     } else {
         alert("올바른 금액을 입력해주세요.");
     }
 });
 
-// 송금 모달
+//========= 송금 =============
 document.getElementById('sendBtn').addEventListener('click', () => {
-    document.getElementById('sendModal').style.display = "flex";
+    askSendType();
 });
+
+function askSendType() {
+    // 모달 등 원하는 UI로 바꿀 수 있음. 예시는 prompt
+    const type = prompt("송금 방법을 선택하세요. (1: 계좌송금, 2: 연락처송금)");
+    if (type == "1") {
+        openAccountSendModal();
+    } else if (type == "2") {
+        openContactSendModal();
+    }
+}
+
+function openAccountSendModal() {
+    document.getElementById('sendModal').style.display = "flex";
+}
+
 window.closeSendModal = function () {
     document.getElementById('sendModal').style.display = "none";
 };
 document.getElementById('accountInputBtn').addEventListener('click', () => {
     const account = prompt("계좌번호를 입력하세요:");
     if (!account) return alert("계좌번호를 입력해야 합니다.");
-
     const amount = prompt("송금할 금액을 입력하세요:");
     const intAmount = parseInt(amount);
     if (isNaN(intAmount) || intAmount <= 0) return alert("올바른 금액을 입력해주세요.");
     if (intAmount > balance) return alert("잔액이 부족합니다.");
-
     balance -= intAmount;
-    updateBalance();
-    alert(account + " 계좌로 " + intAmount.toLocaleString() + "원을 송금했습니다.");
-    closeSendModal();
+    setBalanceOnServer(balance).then(() => {
+        updateBalance();
+        saveMoneyHistory("send", intAmount, "계좌:" + account);
+        alert(account + " 계좌로 " + intAmount.toLocaleString() + "원을 송금했습니다.");
+        closeSendModal();
+    });
 });
 
-updateBalance();
-//---------충전 및 송금 ------------
+function openContactSendModal() {
+    fetch('http://localhost:3000/api/contacts')
+        .then(res => res.json())
+        .then(data => {
+            showContactSendList(data.contacts || []);
+        });
+}
+
+// 연락처 리스트 동적 생성
+function showContactSendList(contacts) {
+    // 예시: 모달이름 'contactSendModal' 사용
+    let modal = document.getElementById('contactSendModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'contactSendModal';
+        modal.style = 'position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:10000;display:flex;align-items:center;justify-content:center;';
+        modal.innerHTML = `
+          <div style="background:white;padding:20px;border-radius:16px;min-width:250px;">
+            <div style="font-weight:bold;margin-bottom:10px;">연락처로 송금</div>
+            <div id="contactList"></div>
+            <button onclick="document.body.removeChild(this.parentNode.parentNode)">닫기</button>
+          </div>`;
+        document.body.appendChild(modal);
+    }
+    const listDiv = modal.querySelector('#contactList');
+    listDiv.innerHTML = '';
+    contacts.forEach(c => {
+        const btn = document.createElement('button');
+        btn.textContent = c.name + ' (' + c.number + ')';
+        btn.style = 'display:block;margin:4px 0;padding:8px 12px;font-size:16px;';
+        btn.onclick = function () {
+            askSendAmountByContact(c.name, c.number);
+            document.body.removeChild(modal); // 닫기
+        };
+        listDiv.appendChild(btn);
+    });
+}
+
+// 금액 입력받아 송금 처리
+function askSendAmountByContact(name, number) {
+    const amount = prompt(`${name}님에게 송금할 금액을 입력하세요:`);
+    const intAmount = parseInt(amount);
+    if (isNaN(intAmount) || intAmount <= 0) return alert("올바른 금액을 입력해주세요.");
+    if (intAmount > balance) return alert("잔액이 부족합니다.");
+    balance -= intAmount;
+    setBalanceOnServer(balance).then(() => {
+        updateBalance();
+        saveMoneyHistory("send", intAmount, "연락처:" + name + "/" + number);
+        alert(`${name}님(${number})에게 ${intAmount.toLocaleString()}원을 송금했습니다.`);
+    });
+};
+
+//========= 잔액 처음 표시 =========
+fetchBalanceAndUpdate();
+
+//--------- 나머지 기존 음성/네비/서비스 버튼 로직 동일 ----------
+/* ... 이하 기존 음성 명령/네비 버튼 로직 ... */
+
 
 // 1. 하단 네비게이션/서비스 버튼 클릭 시 이동
 document.getElementById('nav-home').onclick = () => location.href = 'home.html';
