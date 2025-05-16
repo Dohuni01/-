@@ -3,121 +3,113 @@ import React, { useState } from "react";
 import SwipePage from "../components/SwipePage";
 import Mic from "../components/Mic";
 
-// 계좌 리스트 예시
-const ACCOUNTS = [
-  {
-    bank: "국민은행",
-    num: "9934",
-    type: "나라사랑",
-    balance: 1643056,
-    icon: "🌝", // 실제 이미지는 src/assets에 넣고 <img>로 교체 가능
-  },
-  {
-    bank: "토스뱅크",
-    num: "1234",
-    type: "입출금",
-    balance: 870000,
-    icon: "💳",
-  },
-  {
-    bank: "신한은행",
-    num: "6789",
-    type: "주거래",
-    balance: 532000,
-    icon: "🔷",
-  },
-];
+const payMoney = 1_643_056;
 
-// 금액 버튼 목록
-const BUTTONS = [
+const CHARGE_BUTTONS = [
   { label: "100만원", value: 1000000 },
   { label: "50만원", value: 500000 },
   { label: "30만원", value: 300000 },
   { label: "20만원", value: 200000 },
   { label: "10만원", value: 100000 },
-  { label: "직접 입력하기", value: "custom" }
+  { label: "직접 입력하기", value: "custom" },
+];
+
+// 머니 내역 더미데이터
+const HISTORY = [
+  { month: 5, detail: "5월: 충전 100,000원" },
+  { month: 4, detail: "4월: 충전 300,000원" },
+  { month: 3, detail: "3월: 충전 200,000원" },
+  { month: 2, detail: "2월: 충전 400,000원" },
+  { month: 1, detail: "1월: 충전 150,000원" },
 ];
 
 export default function Benefit() {
-  const [selectedAccount, setSelectedAccount] = useState(0);
+  const [mode, setMode] = useState("main"); // main, charge, history
 
-  const account = ACCOUNTS[selectedAccount];
-
-  // 좌우 계좌 전환
-  const handlePrev = () => setSelectedAccount(i => (i - 1 + ACCOUNTS.length) % ACCOUNTS.length);
-  const handleNext = () => setSelectedAccount(i => (i + 1) % ACCOUNTS.length);
-
-  // 최대 충전 가능 금액(임의)
-  const maxAmount = 1839120;
+  // 금액 직접 입력 예시
+  const [custom, setCustom] = useState("");
 
   return (
     <SwipePage>
-      <div className="flex flex-col items-center min-h-screen bg-[#23232A] px-4 pt-10 relative">
-        {/* 상단 계좌 박스 */}
-        <div className="w-full max-w-md flex items-center justify-between mb-8">
+      <div className="flex flex-col items-center min-h-screen bg-[#ece9f9] px-4 pt-10 transition-colors duration-300">
+        {/* 상단 Pay머니 영역 */}
+        <div className="w-full max-w-md flex flex-col items-center bg-white rounded-2xl shadow-md px-6 py-7 mb-8">
+          <div className="text-3xl font-extrabold text-[#251c4c] mb-1">페이머니</div>
+          <div className="text-lg text-gray-700 font-bold mb-2">{payMoney.toLocaleString()}원</div>
+        </div>
+
+        {/* 머니내역/충전 버튼 */}
+        <div className="w-full max-w-md flex gap-3 mb-8">
           <button
-            className="w-10 h-10 rounded-full bg-[#363740] flex items-center justify-center text-white text-2xl"
-            onClick={handlePrev}
-            aria-label="이전 계좌"
+            className={`flex-1 py-3 rounded-xl font-bold text-lg shadow ${mode === "history"
+              ? "bg-[#5742b6] text-white"
+              : "bg-white text-[#5742b6] hover:bg-[#ede6ff]"}`}
+            onClick={() => setMode("history")}
           >
-            &#60;
+            머니내역
           </button>
-          <div className="flex-1 mx-4 bg-[#363740] rounded-2xl flex items-center px-4 py-4 shadow">
-            {/* 아이콘/이미지 */}
-            <div className="w-12 h-12 rounded-full bg-[#857661] flex items-center justify-center text-2xl mr-4">
-              {account.icon}
+          <button
+            className={`flex-1 py-3 rounded-xl font-bold text-lg shadow ${mode === "charge"
+              ? "bg-[#5742b6] text-white"
+              : "bg-white text-[#5742b6] hover:bg-[#ede6ff]"}`}
+            onClick={() => setMode("charge")}
+          >
+            충전
+          </button>
+        </div>
+
+        {/* 본문 영역 */}
+        <div className="w-full max-w-md flex-1 flex flex-col items-center">
+          {/* 머니내역 모드 */}
+          {mode === "history" && (
+            <div className="w-full flex flex-col gap-4">
+              {HISTORY.map(item => (
+                <div key={item.month} className="flex items-center gap-4 bg-white px-5 py-4 rounded-lg shadow">
+                  <div className="text-2xl font-bold text-[#857661]">{item.month}월</div>
+                  <div className="text-gray-700 text-base">{item.detail}</div>
+                </div>
+              ))}
             </div>
-            <div className="flex flex-col justify-center flex-1">
-              <div className="text-lg text-white font-semibold">
-                {account.bank} {account.num} 에서
+          )}
+
+          {/* 충전 모드 */}
+          {mode === "charge" && (
+            <div className="w-full flex flex-col items-center">
+              <div className="grid grid-cols-3 grid-rows-2 gap-4 w-full mb-6">
+                {CHARGE_BUTTONS.slice(0, 5).map(btn => (
+                  <button
+                    key={btn.label}
+                    className="h-20 rounded-2xl bg-white text-[#5742b6] font-bold text-xl shadow hover:bg-[#ede6ff] transition"
+                    // onClick 등 추가
+                  >
+                    {btn.label}
+                  </button>
+                ))}
+                <button
+                  key={CHARGE_BUTTONS[5].label}
+                  className="h-20 rounded-2xl bg-white text-[#5742b6] font-bold text-base shadow hover:bg-[#ede6ff] transition col-span-3"
+                  onClick={() => setCustom("직접입력")}
+                >
+                  {CHARGE_BUTTONS[5].label}
+                </button>
               </div>
-              <div className="text-gray-300 text-sm">{account.type} | {account.balance.toLocaleString()}원</div>
-            </div>
-            <div className="text-gray-400 ml-2 text-lg">{/* &gt; */}▶</div>
-          </div>
-          <button
-            className="w-10 h-10 rounded-full bg-[#363740] flex items-center justify-center text-white text-2xl"
-            onClick={handleNext}
-            aria-label="다음 계좌"
-          >
-            &#62;
-          </button>
-        </div>
-
-        {/* 최대 가능 금액 */}
-        
-
-        {/* 3x2 그리드 버튼 */}
-        <div className="w-full max-w-md grid grid-cols-3 grid-rows-2 gap-4 mt-3 mb-12">
-          {BUTTONS.slice(0, 5).map((btn, idx) => (
-            <button
-              key={btn.label}
-              className={`
-                flex flex-col items-center justify-center h-20 rounded-2xl bg-[#2e2f35] 
-                text-white font-bold text-xl shadow hover:bg-[#363740] transition
-              `}
-              // onClick={...} // TODO: 클릭 이벤트 추가 가능
-            >
-              {btn.label}
-              {idx === 0 && (
-                <span className="block mt-1 text-xs text-gray-400 font-normal">
-                  {/* 100만원 오른쪽 설명 */}
-                </span>
+              {/* 직접 입력시 입력창 노출 (옵션) */}
+              {custom && (
+                <input
+                  type="number"
+                  className="w-full py-3 px-4 rounded-lg border mt-2 text-lg"
+                  placeholder="금액 입력 (원)"
+                  value={custom === "직접입력" ? "" : custom}
+                  onChange={e => setCustom(e.target.value)}
+                />
               )}
-            </button>
-          ))}
-          <button
-            key={BUTTONS[5].label}
-            className={`
-              flex flex-col items-center justify-center h-20 rounded-2xl bg-[#2e2f35] 
-              text-white font-bold text-base shadow hover:bg-[#363740] transition
-            `}
-            // onClick={...} // TODO: 클릭 이벤트 추가 가능
-          >
-            {BUTTONS[5].label}
-          </button>
+              <div className="text-sm text-gray-500">최대 1,839,120원 충전 가능</div>
+            </div>
+          )}
         </div>
-        <Mic />
+        <div className="mt-auto w-full flex justify-center pb-8">
+          <Mic />
+        </div>
       </div>
     </SwipePage>
   );
