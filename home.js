@@ -1,3 +1,65 @@
+//---------충전 및 송금 부분--------
+let balance = 0;
+
+// 잔액 표시 업데이트
+function updateBalance() {
+  document.getElementById('balance').textContent = balance.toLocaleString() + "원";
+}
+
+// 충전 모달
+document.getElementById('chargeBtn').addEventListener('click', () => {
+  document.getElementById('modal').style.display = "flex";
+});
+window.closeModal = function () {
+  document.getElementById('modal').style.display = "none";
+};
+document.querySelectorAll('.quick-charge').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const amount = parseInt(this.getAttribute('data-amount'));
+    balance += amount;
+    updateBalance();
+    alert(amount.toLocaleString() + "원이 충전되었습니다.");
+    closeModal();
+  });
+});
+document.getElementById('customCharge').addEventListener('click', () => {
+  const input = prompt("충전할 금액을 직접 입력하세요:");
+  const amount = parseInt(input);
+  if (!isNaN(amount) && amount > 0) {
+    balance += amount;
+    updateBalance();
+    alert(amount + "원이 충전되었습니다.");
+    closeModal();
+  } else {
+    alert("올바른 금액을 입력해주세요.");
+  }
+});
+
+// 송금 모달
+document.getElementById('sendBtn').addEventListener('click', () => {
+  document.getElementById('sendModal').style.display = "flex";
+});
+window.closeSendModal = function () {
+  document.getElementById('sendModal').style.display = "none";
+};
+document.getElementById('accountInputBtn').addEventListener('click', () => {
+  const account = prompt("계좌번호를 입력하세요:");
+  if (!account) return alert("계좌번호를 입력해야 합니다.");
+
+  const amount = prompt("송금할 금액을 입력하세요:");
+  const intAmount = parseInt(amount);
+  if (isNaN(intAmount) || intAmount <= 0) return alert("올바른 금액을 입력해주세요.");
+  if (intAmount > balance) return alert("잔액이 부족합니다.");
+
+  balance -= intAmount;
+  updateBalance();
+  alert(account + " 계좌로 " + intAmount.toLocaleString() + "원을 송금했습니다.");
+  closeSendModal();
+});
+
+updateBalance();
+//---------충전 및 송금 ------------
+
 // 1. 하단 네비게이션/서비스 버튼 클릭 시 이동
 document.getElementById('nav-home').onclick = () => location.href = 'home.html';
 document.getElementById('nav-benefit').onclick = () => location.href = 'benefit.html';
