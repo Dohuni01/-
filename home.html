@@ -703,6 +703,9 @@
             };
 
             voiceBtn.onclick = function () {
+                // 🔥 음성 합성(TTS) 중이면 즉시 중단
+                window.speechSynthesis.cancel();
+
                 if (!isRecording) {
                     recognition.start();
                     isRecording = true;
