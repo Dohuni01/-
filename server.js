@@ -21,55 +21,32 @@ const pages = [
     { name: "페이퍼", file: "paper.html" }
 ];
 
+// askgpt: 페이지/명령/상담
 app.post('/askgpt', async (req, res) => {
     try {
         const question = req.body.question;
-        if (!question) {
-            return res.status(400).json({ answer: '질문이 없습니다.' });
-        }
+        if (!question) return res.status(400).json({ answer: '질문이 없습니다.' });
 
-        // 프롬프트에 '반드시 아래 5개 파일명만 이동 명령에 사용' 명시!
         const prompt = `
 아래는 사용자가 카카오페이 홈/자산/결제/혜택/증권 페이지에서 음성명령으로 요청하는 내용이야.
-
-- 만약 사용자가 "페이지 이동"이나 "창 이동" 같은 명령(예: 자산창으로 이동해줘, 결제창으로 가줘, 혜택 보여줘 등)을 했으면
-  반드시 아래 중 하나의 파일명만 골라서
-  "페이지 이동: [파일명]" 이렇게만 답해줘.
+- "페이지 이동" 명령 시 반드시 아래 파일명 중 하나로만 이동:
   - home.html (홈)
   - benefit.html (혜택)
   - pay.html (결제)
   - money.html (자산/머니)
   - paper.html (증권/페이퍼)
-- 단순히 정보(예: 내 자산 얼마야, 혜택 뭐 있어, 결제 설명해줘 등)를 물어보면 이동 명령 없이 자연스럽게 답해줘.
-
+- 충전 명령 → "명령: charge"
+- 송금 명령 → "명령: send"
+- 잔액 질의 → "명령: change"
+- 단순 정보/상담/공감은 자연스럽게 답변.
 
 [사용자 질문]
 ${question}
-
-[예시]
-- "자산창으로 이동해줘" → "페이지 이동: money.html"
-- "홈으로 가" → "페이지 이동: home.html"
-- "증권 보여줘" → "페이지 이동: paper.html"
-- "혜택 알려줘" → "현재 특별한 혜택은 없습니다."
-- "결제창으로 이동" → "페이지 이동: pay.html"
-- "홈에서 혜택창으로 이동해줘" → "페이지 이동: benefit.html"
-- "안녕" → "안녕하세요!"
-- 만약 사용자가 충전, 충전해줘, 1만원 충전, 돈 충전, 잔액 충전 등 '충전'과 관련된 명령을 하면
-  "명령: charge"로 답해줘.
-- 만약 사용자가 송금, 돈 보내, 송금할래 등 '송금'과 관련된 명령을 하면
-  "명령: send"로 답해줘.
-- 만약 사용자가 잔액, 잔고, 남은 돈 등 '남은 내가 가지고 있는 돈'과 관련된 명령을 하면
-  "명령: change"로 답해줘.
-- 오직 다음과 같은 명확한 질문에만 잔액 안내: "잔액", "잔고", "내 돈 얼마", "내 잔액 얼마", "내가 가진 돈", "내가 가지고 있는 돈", "내 통장 얼마", "잔액 얼마야" 등.
-- 그 외 "배고프다", "돈 없다", "힘들다" 등은 잔액 안내하지 말고, 공감/위로/상담식 답변만 해.
-- 위와 상관없는 명령이면 그냥 gpt너의 답장을 해줘.
 `;
 
         const completion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
-            messages: [
-                { role: "system", content: prompt }
-            ],
+            messages: [{ role: "system", content: prompt }],
             max_tokens: 400,
         });
 
@@ -80,6 +57,59 @@ ${question}
     }
 });
 
+// 긍/부정 판별
+app.post('/checkyesno', async (req, res) => {
+    try {
+        const userAnswer = req.body.answer;
+        if (!userAnswer) return res.status(400).json({ result: 'unknown', error: 'no answer given' });
+        const prompt = `
+아래 답변이 "네"인지 "아니요"인지 판단해서 yes, no, unknown으로만 답하세요.
+예시 - yes: 네, 예, 진행시켜, 충전해줘, 맞아요 등
+예시 - no: 아니요, 싫어, 안돼 등
+예시 - unknown: 잘 모르겠어, 음...
+[답변]
+${userAnswer}
+`;
+
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "system", content: prompt }],
+            max_tokens: 10,
+        });
+
+        const gptAnswer = completion.choices[0].message.content.trim().toLowerCase();
+        res.json({ result: gptAnswer });
+    } catch (err) {
+        res.json({ result: 'unknown', error: err.message });
+    }
+});
+
+// 🔥 자연어 금액을 AI로 정수로 변환
+app.post('/extractamount', async (req, res) => {
+    try {
+        const speech = req.body.speech || "";
+        const prompt = `
+아래 한국어 금액 표현을 숫자(정수)로만 답하세요. 단위는 무시. "삼만오천원" → 35000, "이십오만" → 250000 등.
+이상하거나 금액 없으면 0만 답하세요.
+[금액]
+${speech}
+`;
+
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "system", content: prompt }],
+            max_tokens: 12,
+        });
+
+        const answer = completion.choices[0].message.content.trim();
+        const onlyNum = answer.replace(/[^\d]/g, "");
+        res.json({ amount: onlyNum || "0" });
+
+    } catch (err) {
+        res.json({ amount: "0", error: err.message });
+    }
+});
+
 app.listen(3000, () => {
-    console.log('서버가 http://localhost:3100 에서 실행 중!');
+    console.log('서버가 http://localhost:3000 에서 실행 중!');
 });
