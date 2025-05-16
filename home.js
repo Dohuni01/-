@@ -137,26 +137,22 @@ if (!window.SpeechRecognition) {
                     location.href = moveMatch[1];
                     return;
                 }
-
-                // 2. 명령어 패턴 추출 및 매핑
                 const cmdMatch = answer.match(/명령: (\w+)/);
                 const actionMap = {
                     charge: () => document.getElementById('modal').style.display = "flex",
                     send: () => document.getElementById('sendModal').style.display = "flex",
                     change: () => {
-                        const change = new SpeechSynthesisUtterance("현재 남은 금액은 " + balance + "원 입니다.");
+                        const change = new SpeechSynthesisUtterance(`현재 남은 금액은 ${balance.toLocaleString()}원 입니다.`);
                         change.lang = 'ko-KR';
                         window.speechSynthesis.speak(change);
                     }
-
-                    // 앞으로 여기에 원하는 기능 확장!
                 };
                 if (cmdMatch && actionMap[cmdMatch[1]]) {
                     actionMap[cmdMatch[1]]();
                     return;
                 }
 
-                // 3. 그 외는 TTS 답변
+                // **나머지 응답은 다 TTS로 읽어주기**
                 const tts = new SpeechSynthesisUtterance(answer);
                 tts.lang = 'ko-KR';
                 window.speechSynthesis.speak(tts);
@@ -180,20 +176,20 @@ if (!window.SpeechRecognition) {
         }
     };
 
-    // 홈 진입시 안내멘트+자동음성인식 (브라우저 정책상 첫 진입은 클릭후 동작이 보장)
-    window.addEventListener('DOMContentLoaded', () => {
-        if (window.SpeechRecognition && recognition && !isRecording) {
-            const greeting = new SpeechSynthesisUtterance("안녕하세요 보이스 뱅크입니다. 무엇을 도와드릴까요?");
-            greeting.lang = 'ko-KR';
-            window.speechSynthesis.speak(greeting);
+    // // 홈 진입시 안내멘트+자동음성인식 (브라우저 정책상 첫 진입은 클릭후 동작이 보장)
+    // window.addEventListener('DOMContentLoaded', () => {
+    //     if (window.SpeechRecognition && recognition && !isRecording) {
+    //         const greeting = new SpeechSynthesisUtterance("안녕하세요 보이스 뱅크입니다. 무엇을 도와드릴까요?");
+    //         greeting.lang = 'ko-KR';
+    //         window.speechSynthesis.speak(greeting);
 
-            greeting.onend = () => {
-                if (!isRecording) {
-                    recognition.start();
-                    isRecording = true;
-                    voiceBtn.innerHTML = '<span class="voice-icon">⏹️</span>';
-                }
-            };
-        }
-    });
+    //         greeting.onend = () => {
+    //             if (!isRecording) {
+    //                 recognition.start();
+    //                 isRecording = true;
+    //                 voiceBtn.innerHTML = '<span class="voice-icon">⏹️</span>';
+    //             }
+    //         };
+    //     }
+    // });
 }
